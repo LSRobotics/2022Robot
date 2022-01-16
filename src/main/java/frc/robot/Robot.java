@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import edu.wpi.first.math.controller.PIDController;
+
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -20,6 +23,14 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  private PIDController movePid;
+  private PIDController gyroPid;
+  private static final int P = 1;
+  private static final int I = 0;
+  private static final int D = 0;
+
+  private int autoIncrement;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -29,6 +40,11 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+  
+    movePid = new PIDController(P,I,D); //TODO: figure out the kP, kI, and kD values required for actual instantiation
+    
+
+    
   }
 
   /**
@@ -54,6 +70,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
+    autoIncrement = 0;
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
   }
@@ -64,6 +81,26 @@ public class Robot extends TimedRobot {
     switch (m_autoSelected) {
       case kCustomAuto:
         // Put custom auto code here
+        switch (autoIncrement) {
+          case 0:
+            
+            break;
+          case 1:
+
+            break;
+        }
+
+        if (movePid.atSetpoint()) {
+          autoIncrement++;
+          //the setpoints
+          switch (autoIncrement) {
+            case 0:
+              movePid.setSetpoint(5);
+            case 1:
+              movePid.setSetpoint(3);
+          }
+        }
+
         break;
       case kDefaultAuto:
       default:

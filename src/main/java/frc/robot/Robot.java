@@ -30,11 +30,12 @@ public class Robot extends TimedRobot {
   MotorControllerGroup right_motors;
   DifferentialDrive drive;
 
-  WPI_TalonFX fl_drive;
-  WPI_TalonFX fr_drive;
-  WPI_TalonFX bl_drive;
-  WPI_TalonFX br_drive;
-  XboxController gp;
+  public static WPI_TalonFX fl_drive;
+  public static WPI_TalonFX fr_drive;
+  public static WPI_TalonFX bl_drive;
+  public static WPI_TalonFX br_drive;
+
+  public XboxController gp;
 
   double speed;
 
@@ -57,17 +58,15 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
 
-    fl_drive = new WPI_TalonFX(1);
-    fr_drive = new WPI_TalonFX(2);
-    bl_drive = new WPI_TalonFX(3);
-    br_drive = new WPI_TalonFX(4);
-    gp = new XboxController(0);
+
+    initializeMotorControllers();
+
+    initializeGamePad();
 
     left_motors = new MotorControllerGroup(fl_drive, bl_drive);
     right_motors = new MotorControllerGroup(fr_drive, br_drive);
     drive = new DifferentialDrive(left_motors, right_motors);
 
-    speed = 1;
 
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
@@ -167,4 +166,17 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
+
+  private void initializeGamePad(){
+    gp = new XboxController(Statics.XboxController_ID);
+  }
+
+  private static void initializeMotorControllers() {
+    fl_drive = new WPI_TalonFX(Statics.Front_Left_Motor_ID);
+    fr_drive = new WPI_TalonFX(Statics.Front_Right_Motor_ID);
+    bl_drive = new WPI_TalonFX(Statics.Back_Left_Motor_ID);
+    br_drive = new WPI_TalonFX(Statics.Back_Right_Motor_ID);
+  }
+
+
 }

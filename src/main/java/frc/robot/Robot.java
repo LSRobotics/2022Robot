@@ -118,7 +118,7 @@ public class Robot extends TimedRobot {
         // Put custom auto code here
         switch (autoIncrement) {
           case 0:
-
+          drive.arcadeDrive(movePid.calculate(fl_drive.getSelectedSensorPosition()), 0); //TODO: please check if this works as intended.
             break;
           case 1:
 

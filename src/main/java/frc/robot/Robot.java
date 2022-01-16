@@ -6,7 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -22,6 +21,10 @@ import edu.wpi.first.math.controller.PIDController;
  * project.
  */
 public class Robot extends TimedRobot {
+
+
+  private static final String kDefaultAuto = "Default";
+  private static final String kCustomAuto = "My Auto";
 
   MotorControllerGroup left_motors;
   MotorControllerGroup right_motors;
@@ -42,6 +45,10 @@ public class Robot extends TimedRobot {
   private static final int D = 0;
 
   private int autoIncrement;
+
+  private String m_autoSelected;
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+
 
   /**
    * This function is run when the robot is first started up and should be used for any

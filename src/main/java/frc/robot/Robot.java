@@ -6,7 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -28,6 +28,8 @@ public class Robot extends TimedRobot {
   WPI_TalonFX br_drive;
   XboxController gp;
 
+  double speed;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -45,6 +47,8 @@ public class Robot extends TimedRobot {
     right_motors = new MotorControllerGroup(fr_drive, br_drive);
     drive = new DifferentialDrive(left_motors, right_motors);
 
+    speed = 1;
+
   }
 
   /**
@@ -56,7 +60,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    drive.tankDrive(gp.getY(Hand.kLeft), gp.getY(Hand.kRight));
+    drive.arcadeDrive(gp.getRightTriggerAxis()-gp.getLeftTriggerAxis(), gp.getLeftX());
+
+  
 
   }
   /**

@@ -5,11 +5,15 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.math.controller.PIDController;
-
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,10 +22,18 @@ import edu.wpi.first.math.controller.PIDController;
  * project.
  */
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+
+  MotorControllerGroup left_motors;
+  MotorControllerGroup right_motors;
+  DifferentialDrive drive;
+
+  WPI_TalonFX fl_drive;
+  WPI_TalonFX fr_drive;
+  WPI_TalonFX bl_drive;
+  WPI_TalonFX br_drive;
+  XboxController gp;
+
+  double speed;
 
   private PIDController movePid;
   private PIDController gyroPid;
@@ -37,14 +49,26 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+
+    fl_drive = new WPI_TalonFX(1);
+    fr_drive = new WPI_TalonFX(2);
+    bl_drive = new WPI_TalonFX(3);
+    br_drive = new WPI_TalonFX(4);
+    gp = new XboxController(0);
+
+    left_motors = new MotorControllerGroup(fl_drive, bl_drive);
+    right_motors = new MotorControllerGroup(fr_drive, br_drive);
+    drive = new DifferentialDrive(left_motors, right_motors);
+
+    speed = 1;
+
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-  
-    movePid = new PIDController(P,I,D); //TODO: figure out the kP, kI, and kD values required for actual instantiation
-    
 
-    
+    movePid = new PIDController(P,I,D); //TODO: figure out the kP, kI, and kD values required for actual instantiation
+
+
   }
 
   /**
@@ -55,8 +79,12 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    drive.arcadeDrive(gp.getRightTriggerAxis()-gp.getLeftTriggerAxis(), gp.getLeftX());
 
+
+
+  }
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
    * autonomous modes using the dashboard. The sendable chooser code works with the Java
@@ -83,7 +111,7 @@ public class Robot extends TimedRobot {
         // Put custom auto code here
         switch (autoIncrement) {
           case 0:
-            
+
             break;
           case 1:
 

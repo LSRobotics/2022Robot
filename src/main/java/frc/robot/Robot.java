@@ -41,12 +41,11 @@ public class Robot extends TimedRobot {
     initializeMotorControllers();
 
     initializeGamePad();
-    
+
     left_motors = new MotorControllerGroup(fl_drive, bl_drive);
     right_motors = new MotorControllerGroup(fr_drive, br_drive);
     drive = new DifferentialDrive(left_motors, right_motors);
 
-    speed = 1;
 
   }
 

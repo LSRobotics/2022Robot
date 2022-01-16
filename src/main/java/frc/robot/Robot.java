@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 /**
@@ -18,8 +18,8 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  */
 public class Robot extends TimedRobot {
 
-  SpeedControllerGroup left_motors;
-  SpeedControllerGroup right_motors;
+  MotorControllerGroup left_motors;
+  MotorControllerGroup right_motors;
   DifferentialDrive drive;
   
   WPI_TalonFX fl_drive;
@@ -41,8 +41,8 @@ public class Robot extends TimedRobot {
     br_drive = new WPI_TalonFX(4);
     gp = new XboxController(0);
 
-    left_motors = new SpeedControllerGroup(fl_drive, bl_drive);
-    right_motors = new SpeedControllerGroup(fr_drive, br_drive);
+    left_motors = new MotorControllerGroup(fl_drive, bl_drive);
+    right_motors = new MotorControllerGroup(fr_drive, br_drive);
     drive = new DifferentialDrive(left_motors, right_motors);
 
   }

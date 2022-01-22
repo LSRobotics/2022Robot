@@ -30,6 +30,15 @@ public class Robot extends TimedRobot {
 
   double speed;
 
+  public XboxController gp1;
+  public PowerDistributionPanel pdp;
+
+  AnalogInput ultrasonic;  
+  
+
+  //public VictorSPX motor1;
+
+  
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -88,7 +97,11 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    shuffleboardGo();
+    if(gp1.getXButtonPressed())
+      Camera.changeCam();
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override

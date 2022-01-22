@@ -16,6 +16,7 @@ public class Statics {
     public static int ultrasonic = 7; //ID has to be figured out
     public static double cm_to_in = 0.049212598;
     public static double inchToSensorUnits = 2148.15278;
+	public static double stickDeadzone;
     
     /*
     public static int navx = 10;

@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.Joystick;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -33,7 +36,7 @@ public class Robot extends TimedRobot {
   double speed;
 
   public XboxController gp1;
-  public PowerDistributionPanel pdp;
+  public PowerDistribution pdp;
 
   AnalogInput ultrasonic;  
   
@@ -133,14 +136,14 @@ public class Robot extends TimedRobot {
   }
 
 
-}
-}
 
+
+public static double stickDeadzone = 0.1;
 
 
 public void move(double throttleForward, double throttleBackward, double turn) {
   double throttle = throttleForward - throttleBackward;
-  
+
   if(Math.abs(throttle) <= Statics.stickDeadzone){
     throttle = 0;
   }
@@ -148,8 +151,33 @@ public void move(double throttleForward, double throttleBackward, double turn) {
   if (Math.abs(turn) <= Statics.stickDeadzone) {
     turn = 0;
   }
+}
+
+public double getRangeInches(double rawVoltage){
+  return rawVoltage * Statics.cm_to_in;
+}
+
+public void shuffleboardGo(){
+  Shuffleboard.startRecording();
+
+  SmartDashboard.putNumber("Left Motor",fl_drive.get());  
+  SmartDashboard.putNumber("Right Motor", fr_drive.get());
+
+  SmartDashboard.putNumber("Voltage", pdp.getVoltage());
+  SmartDashboard.putNumber("Ultrasonic Distance", getRangeInches(ultrasonic.getValue()));
+
+  //SmartDashboard.putNumber("NAVX Z-Axis", navx.getYaw()); navX code needed
+}
+
+public void noMoreShuffleboard(){
+  Shuffleboard.stopRecording();
+}
+
+
+
+}
 
   //throttle *= Math.abs(throttle); just case we want to square it
   //turn *= Math.abs(turn);
 
-}
+

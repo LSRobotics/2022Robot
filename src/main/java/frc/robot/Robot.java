@@ -11,8 +11,12 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+
+import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.wpilibj.SPI; //TODO: change the port system depending on what we actually use
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -50,6 +54,20 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  private AHRS ahrs;
+
+  private enum AutonMode {
+    DRIVE, 
+    TURN
+  }
+
+  private AutonMode currentAuton;
+
+  private boolean autonConditionCompleted;
+
+  private double autonTarget;
+
+  private double autonStartingPos;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -74,6 +92,7 @@ public class Robot extends TimedRobot {
 
     movePid = new PIDController(P,I,D); //TODO: figure out the kP, kI, and kD values required for actual instantiation
 
+    ahrs = new AHRS(SPI.Port.kMXP);
 
   }
 
@@ -105,6 +124,8 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
     autoIncrement = 0;
+    autonConditionCompleted = false;
+    currentAuton = AutonMode.DRIVE;
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
   }
@@ -115,23 +136,39 @@ public class Robot extends TimedRobot {
     switch (m_autoSelected) {
       case kCustomAuto:
         // Put custom auto code here
-        switch (autoIncrement) {
-          case 0:
-          drive.arcadeDrive(movePid.calculate(fl_drive.getSelectedSensorPosition()), 0); //TODO: please check if this works as intended.
-            break;
-          case 1:
 
-            break;
-        }
 
-        if (movePid.atSetpoint()) {
+
+        if (autonConditionCompleted) {
           autoIncrement++;
           //the setpoints
           switch (autoIncrement) {
             case 0:
-              movePid.setSetpoint(5);
+              setAuton(AutonMode.DRIVE, 3);
+              break;
             case 1:
-              movePid.setSetpoint(3);
+              setAuton(AutonMode.TURN, 5);
+              break;
+          }
+
+          autonConditionCompleted = false;
+        }
+
+        if (currentAuton == AutonMode.DRIVE) {
+          double error = ahrs.getAngle();
+          double turn = error;
+          drive.arcadeDrive(movePid.calculate(getAverageEncoderDistance()-autonStartingPos), turn); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
+
+          if (movePid.atSetpoint()) {
+            autonConditionCompleted = true;
+          }
+        }
+        else if (currentAuton == AutonMode.TURN) {
+          double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -1.0, 1.0);
+          drive.arcadeDrive(0,currentRotationRate);
+
+          if (gyroPid.atSetpoint()) {
+            autonConditionCompleted = true;
           }
         }
 
@@ -178,5 +215,28 @@ public class Robot extends TimedRobot {
     br_drive = new WPI_TalonFX(Statics.Back_Right_Motor_ID);
   }
 
+  private void setAuton(AutonMode mode, double targetValue) {
+
+    currentAuton = mode;
+    autonTarget = targetValue;
+    ahrs.reset();
+
+    if (mode == AutonMode.DRIVE) {
+      movePid.setSetpoint(targetValue);
+      autonStartingPos = (fl_drive.getSelectedSensorPosition() + fr_drive.getSelectedSensorPosition() + bl_drive.getSelectedSensorPosition() + br_drive.getSelectedSensorPosition())/4;
+    }
+    else if (mode == AutonMode.TURN) {
+      gyroPid.setSetpoint(targetValue);
+    }
+
+  }
+
+  private double getAverageEncoderDistance() {
+    double average;
+
+    average = (fl_drive.getSelectedSensorPosition() + fr_drive.getSelectedSensorPosition() + bl_drive.getSelectedSensorPosition() + br_drive.getSelectedSensorPosition())/4;
+    
+    return average;
+  }
 
 }

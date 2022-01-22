@@ -7,8 +7,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.Joystick;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -130,5 +133,24 @@ public class Robot extends TimedRobot {
     br_drive = new WPI_TalonFX(Statics.Back_Right_Motor_ID);
   }
 
+
+}
+}
+
+
+
+public void move(double throttleForward, double throttleBackward, double turn) {
+  double throttle = throttleForward - throttleBackward;
+  
+  if(Math.abs(throttle) <= Statics.stickDeadzone){
+    throttle = 0;
+  }
+
+  if (Math.abs(turn) <= Statics.stickDeadzone) {
+    turn = 0;
+  }
+
+  //throttle *= Math.abs(throttle); just case we want to square it
+  //turn *= Math.abs(turn);
 
 }

@@ -9,6 +9,31 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.PowerDistribution;
+
+
+
+//import frc.robot.Constants.Statics;
+//import main.java.frc.robot.GyroPIDController;
+
+/**
+ * import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+*/
+//import com.kauailabs.navx.frc.AHRS;
+//import com.ctre.phoenix.motorcontrol.NeutralMode;
+
+
+//public final class Shuffleboard;
+//extends Object;
+
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -30,8 +55,8 @@ public class Robot extends TimedRobot {
 
   double speed;
 
-  public XboxController gp1;
-  public PowerDistributionPanel pdp;
+
+  public PowerDistribution pdp;
 
   AnalogInput ultrasonic;  
   
@@ -55,6 +80,14 @@ public class Robot extends TimedRobot {
     right_motors = new MotorControllerGroup(fr_drive, br_drive);
     drive = new DifferentialDrive(left_motors, right_motors);
 
+    pdp = new PowerDistribution();
+    
+    ultrasonic = new AnalogInput(Statics.ultrasonic);
+
+    
+
+    Camera.startCameras();
+    
 
   }
 
@@ -99,7 +132,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     shuffleboardGo();
-    if(gp1.getXButtonPressed())
+    if(gp.getXButtonPressed())
       Camera.changeCam();
   }
 
@@ -131,4 +164,29 @@ public class Robot extends TimedRobot {
   }
 
 
+
+  
+
+
+  public double getRangeInches(double rawVoltage){
+    return rawVoltage * Statics.cm_to_in;
+  }
+
+  public void shuffleboardGo(){
+    Shuffleboard.startRecording();
+
+    SmartDashboard.putNumber("Left Motor",fl_drive.get());  
+    SmartDashboard.putNumber("Right Motor", fr_drive.get());
+
+    SmartDashboard.putNumber("Voltage", pdp.getVoltage());
+    SmartDashboard.putNumber("Ultrasonic Distance", getRangeInches(ultrasonic.getValue()));
+
+    //SmartDashboard.putNumber("NAVX Z-Axis", navx.getYaw()); navX code needed
+  }
+
+  public void noMoreShuffleboard(){
+    Shuffleboard.stopRecording();
+  }
+  
+  
 }

@@ -190,12 +190,6 @@ public class Robot extends TimedRobot {
     return rawVoltage * Statics.cm_to_in;
   }
 
-  public void ultrasonicReturn (){
-    
-  }
-  public void pdpReturn (){
-    
-  }
 
 
   public void shuffleboardGo(){

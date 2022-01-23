@@ -85,7 +85,7 @@ public class Robot extends TimedRobot {
     ultrasonic = new AnalogInput(Statics.ultrasonic);
 
     
-
+    shuffleboardGo();
     Camera.startCameras();
     
 
@@ -101,8 +101,10 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     drive.arcadeDrive(gp.getRightTriggerAxis()-gp.getLeftTriggerAxis(), gp.getLeftX());
-
-  
+    
+    shuffleboardGo();
+    if(gp.getXButtonPressed())
+      Camera.changeCam();
 
   }
   /**

@@ -102,8 +102,6 @@ public class Robot extends TimedRobot {
     drive.arcadeDrive(gp.getRightTriggerAxis()-gp.getLeftTriggerAxis(), gp.getLeftX());
     
     shuffleboardGo();
-    if(gp.getXButtonPressed())
-      Camera.changeCam();
 
   }
   /**
@@ -132,7 +130,6 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    shuffleboardGo();
     if(gp.getXButtonPressed())
       Camera.changeCam();
   }

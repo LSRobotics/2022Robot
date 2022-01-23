@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PowerDistribution;
 
@@ -175,7 +174,7 @@ public class Robot extends TimedRobot {
   }
 
   public void shuffleboardGo(){
-    Shuffleboard.startRecording();
+    
 
     SmartDashboard.putNumber("Left Motor",fl_drive.get());  
     SmartDashboard.putNumber("Right Motor", fr_drive.get());
@@ -186,9 +185,7 @@ public class Robot extends TimedRobot {
     //SmartDashboard.putNumber("NAVX Z-Axis", navx.getYaw()); navX code needed
   }
 
-  public void noMoreShuffleboard(){
-    Shuffleboard.stopRecording();
-  }
+  
   
   
 }

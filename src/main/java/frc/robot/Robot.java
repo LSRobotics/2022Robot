@@ -73,10 +73,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    drive.arcadeDrive(gp.getRightTriggerAxis()-gp.getLeftTriggerAxis(), gp.getLeftX());
-
-  
-
   }
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
@@ -107,6 +103,7 @@ public class Robot extends TimedRobot {
     shuffleboardGo();
     if(gp1.getXButtonPressed())
       Camera.changeCam();
+    drive.arcadeDrive(gp.getRightTriggerAxis()-gp.getLeftTriggerAxis(), gp.getLeftX());
   }
 
   /** This function is called once when the robot is disabled. */

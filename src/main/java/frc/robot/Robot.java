@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -69,10 +70,11 @@ public class Robot extends TimedRobot {
 
   private double autonStartingPos;
 
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
+  /*private Object[][] AutonInstructions = {
+    {AutonMode.DRIVE, 10}
+  };      // this could be cool but is not practical right now*/
+
+
   @Override
   public void robotInit() {
 
@@ -96,27 +98,14 @@ public class Robot extends TimedRobot {
 
   }
 
-  /**
-   * This function is called every robot packet, no matter the mode. Use this for items like
-   * diagnostics that you want ran during disabled, autonomous, teleoperated and test.
-   *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
-   * SmartDashboard integrated updating.
-   */
+
   @Override
   public void robotPeriodic() {
     drive.arcadeDrive(gp.getRightTriggerAxis()-gp.getLeftTriggerAxis(), gp.getLeftX());
-
-
-
   }
+
   /**
-   * This autonomous (along with the chooser code above) shows how to select between different
-   * autonomous modes using the dashboard. The sendable chooser code works with the Java
-   * SmartDashboard. If you prefer the LabVIEW Dashboard, remove all of the chooser code and
-   * uncomment the getString line to get the auto name from the text box below the Gyro
-   *
-   * <p>You can add additional auto modes by adding additional comparisons to the switch structure
+   * You can add additional auto modes by adding additional comparisons to the switch structure
    * below with additional strings. If using the SendableChooser make sure to add them to the
    * chooser code above as well.
    */
@@ -130,18 +119,23 @@ public class Robot extends TimedRobot {
     System.out.println("Auto selected: " + m_autoSelected);
   }
 
-  /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
     switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
+      case kCustomAuto: //Development Auton
 
-
-
+        //When each step of autonomous is completed
         if (autonConditionCompleted) {
           autoIncrement++;
-          //the setpoints
+          
+
+          /* AUTO INCREMENT [PLACE AUTON INSTRUCTIONS HERE]
+            - each switch case is another instruction
+            - currently it is a switch statement and not an array to allow for some alternative functions to be called other than `set auton`
+            - SetAuton(AutonMode, targetValue) is the main function being used currently.
+              - Current AutonModes are `DRIVE` and `TURN`
+              - the targetValue is the value whatever the specific AutonMode is measuring should reach
+          */
           switch (autoIncrement) {
             case 0:
               setAuton(AutonMode.DRIVE, 3);
@@ -154,22 +148,31 @@ public class Robot extends TimedRobot {
           autonConditionCompleted = false;
         }
 
-        if (currentAuton == AutonMode.DRIVE) {
-          double error = ahrs.getAngle();
-          double turn = error;
-          drive.arcadeDrive(movePid.calculate(getAverageEncoderDistance()-autonStartingPos), turn); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
+        switch (currentAuton) {
+          /* DRIVE MODE
+           - Drives forward some distance in **INSERT**UNITS**HERE**
+           - Uses the ahrs in order to ensure the robot drives straight
+          */
+          case DRIVE: 
+            double error = ahrs.getAngle();
+            double turn = error;
+            drive.arcadeDrive(movePid.calculate(getAverageEncoderDistance()-autonStartingPos), turn); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
 
-          if (movePid.atSetpoint()) {
-            autonConditionCompleted = true;
-          }
-        }
-        else if (currentAuton == AutonMode.TURN) {
-          double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -1.0, 1.0);
-          drive.arcadeDrive(0,currentRotationRate);
+            if (movePid.atSetpoint()) {
+              autonConditionCompleted = true;
+            }
+            break;
+          /* TURN MODE 
+           - Turns some distance in degrees
+          */
+          case TURN: 
+            double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -1.0, 1.0);
+            drive.arcadeDrive(0,currentRotationRate); //might have to clamp the value
 
-          if (gyroPid.atSetpoint()) {
-            autonConditionCompleted = true;
-          }
+            if (gyroPid.atSetpoint()) {
+              autonConditionCompleted = true;
+            }
+            break;
         }
 
         break;
@@ -180,31 +183,25 @@ public class Robot extends TimedRobot {
     }
   }
 
-  /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {}
 
-  /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {}
 
-  /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {}
 
-  /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {}
 
-  /** This function is called once when test mode is enabled. */
   @Override
   public void testInit() {}
 
-  /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
 
-  private void initializeGamePad(){
+  private void initializeGamePad() {
     gp = new XboxController(Statics.XboxController_ID);
   }
 
@@ -221,19 +218,24 @@ public class Robot extends TimedRobot {
     autonTarget = targetValue;
     ahrs.reset();
 
-    if (mode == AutonMode.DRIVE) {
-      movePid.setSetpoint(targetValue);
-      autonStartingPos = (fl_drive.getSelectedSensorPosition() + fr_drive.getSelectedSensorPosition() + bl_drive.getSelectedSensorPosition() + br_drive.getSelectedSensorPosition())/4;
-    }
-    else if (mode == AutonMode.TURN) {
-      gyroPid.setSetpoint(targetValue);
+    switch (mode) {
+      case DRIVE:
+        movePid.setSetpoint(targetValue);
+        autonStartingPos = getAverageEncoderDistance();
+        break;
+      case TURN:
+        gyroPid.setSetpoint(targetValue);
+        break;
     }
 
   }
 
+  /* gAED:
+    - Gets the average encoder distance in each of the main drive motors
+    - Returns a value in sensor units and must be converted (could change later)
+  */
   private double getAverageEncoderDistance() {
     double average;
-
     average = (fl_drive.getSelectedSensorPosition() + fr_drive.getSelectedSensorPosition() + bl_drive.getSelectedSensorPosition() + br_drive.getSelectedSensorPosition())/4;
     
     return average;

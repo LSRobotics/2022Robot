@@ -10,8 +10,13 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import java.util.*;
 
 
 
@@ -29,8 +34,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 //import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 
-//public final class Shuffleboard;
-//extends Object;
+
 
 
 /**
@@ -61,8 +65,11 @@ public class Robot extends TimedRobot {
   
 
   //public VictorSPX motor1;
-
-  
+  ShuffleboardTab tab = Shuffleboard.getTab("Values");
+  NetworkTableEntry rightMotorNetworkTable;
+  NetworkTableEntry leftMotorNetworkTable;
+  NetworkTableEntry ultrasonicDistance;
+  NetworkTableEntry pdpVoltage;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -83,8 +90,21 @@ public class Robot extends TimedRobot {
     
     ultrasonic = new AnalogInput(Statics.ultrasonic);
 
+    rightMotorNetworkTable = tab.add("Right Motor Value", 1)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
+    .getEntry();   
+
+    leftMotorNetworkTable  = tab.add("Left Motor Value", 1)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
+    .getEntry(); 
     
-    shuffleboardGo();
+    ultrasonicDistance = tab.add("Distance to target", 0)
+    .getEntry();
+
+    pdpVoltage = tab.add("PDP voltage", 0).getEntry();
+
+
+    //shuffleboardGo();
     Camera.startCameras();
     
 
@@ -98,11 +118,9 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {
-    drive.arcadeDrive(gp.getRightTriggerAxis()-gp.getLeftTriggerAxis(), gp.getLeftX());
-    
+  public void robotPeriodic() {   
     shuffleboardGo();
-
+    
   }
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
@@ -130,6 +148,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    drive.arcadeDrive(gp.getRightTriggerAxis()-gp.getLeftTriggerAxis(), gp.getLeftX());
+    
     if(gp.getXButtonPressed())
       Camera.changeCam();
   }
@@ -170,8 +190,24 @@ public class Robot extends TimedRobot {
     return rawVoltage * Statics.cm_to_in;
   }
 
-  public void shuffleboardGo(){
+  public void ultrasonicReturn (){
     
+  }
+  public void pdpReturn (){
+    
+  }
+
+
+  public void shuffleboardGo(){
+    double pdpNum = pdp.getVoltage();
+    double distance = getRangeInches(ultrasonic.getValue());
+    double leftMotorN = fl_drive.get();
+    double rightMotorN = fl_drive.get();
+    
+    pdpVoltage.setDouble(pdpNum);
+    ultrasonicDistance.setDouble(distance);
+    rightMotorNetworkTable.setDouble(rightMotorN);
+    leftMotorNetworkTable.setDouble(leftMotorN);
 
     SmartDashboard.putNumber("Left Motor",fl_drive.get());  
     SmartDashboard.putNumber("Right Motor", fr_drive.get());

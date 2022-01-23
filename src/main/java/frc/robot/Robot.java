@@ -167,7 +167,7 @@ public class Robot extends TimedRobot {
           */
           case TURN: 
             double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -1.0, 1.0);
-            drive.arcadeDrive(0,currentRotationRate); //might have to clamp the value
+            drive.arcadeDrive(0,currentRotationRate);
 
             if (gyroPid.atSetpoint()) {
               autonConditionCompleted = true;

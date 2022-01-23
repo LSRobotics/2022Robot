@@ -101,7 +101,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    drive.arcadeDrive(gp.getRightTriggerAxis()-gp.getLeftTriggerAxis(), gp.getLeftX());
   }
 
   /**
@@ -187,7 +186,9 @@ public class Robot extends TimedRobot {
   public void teleopInit() {}
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    drive.arcadeDrive(gp.getRightTriggerAxis()-gp.getLeftTriggerAxis(), gp.getLeftX());
+  }
 
   @Override
   public void disabledInit() {}

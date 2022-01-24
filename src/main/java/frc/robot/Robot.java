@@ -99,9 +99,12 @@ public class Robot extends TimedRobot {
     .getEntry(); 
     
     ultrasonicDistance = tab.add("Distance to target", 0)
+    .withWidget(BuiltInWidgets.kDial)
     .getEntry();
 
-    pdpVoltage = tab.add("PDP voltage", 0).getEntry();
+    pdpVoltage = tab.add("PDP voltage", 0)
+    .withWidget(BuiltInWidgets.kVoltageView)
+    .getEntry();
 
 
     //shuffleboardGo();

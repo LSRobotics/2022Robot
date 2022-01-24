@@ -70,6 +70,7 @@ public class Robot extends TimedRobot {
   NetworkTableEntry leftMotorNetworkTable;
   NetworkTableEntry ultrasonicDistance;
   NetworkTableEntry pdpVoltage;
+  NetworkTableEntry cameraTest;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -106,6 +107,9 @@ public class Robot extends TimedRobot {
     .withWidget(BuiltInWidgets.kVoltageView)
     .getEntry();
 
+    cameraTest = tab.add("camera", 0)
+    .withWidget(BuiltInWidgets.kCameraStream)
+    .getEntry();
 
     //shuffleboardGo();
     Camera.startCameras();

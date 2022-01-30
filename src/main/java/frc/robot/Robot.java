@@ -93,22 +93,32 @@ public class Robot extends TimedRobot {
 
     rightMotorNetworkTable = tab.add("Right Motor Value", 1)
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
+    .withSize(2, 1)
+    .withPosition(0, 0)
     .getEntry();   
 
     leftMotorNetworkTable  = tab.add("Left Motor Value", 1)
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
+    .withSize(2, 1)
+    .withPosition(2, 0)
     .getEntry(); 
     
     ultrasonicDistance = tab.add("Distance to target", 0)
     .withWidget(BuiltInWidgets.kDial)
+    .withSize(3, 2)
+    .withPosition(0, 3)
     .getEntry();
 
     pdpVoltage = tab.add("PDP voltage", 0)
     .withWidget(BuiltInWidgets.kVoltageView)
+    .withSize(1, 1)
+    .withPosition(5, 0)
     .getEntry();
 
     cameraTest = tab.add("camera", 0)
     .withWidget(BuiltInWidgets.kCameraStream)
+    .withSize( 5, 5)
+    .withPosition(7 , 7)
     .getEntry();
 
     //shuffleboardGo();

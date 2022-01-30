@@ -4,12 +4,21 @@
 
 package frc.robot;
 
+
 /** Add your docs here. */
 public class Statics {
     public final static int Front_Left_Motor_ID = 1;
     public final static int Front_Right_Motor_ID = 2;
     public final static int Back_Left_Motor_ID = 3;
     public final static int Back_Right_Motor_ID = 4;
+
+    public final static double Index_Speed = .5;
+    public final static double Intake_Speed = .5;
+
+    public final static int Shooter_Motor_ID = 5;
+    public final static int Index_Motor_ID = 6;
+    public final static int Intake_Motor_ID = 8;
+
 
     public final static int XboxController_ID = 0;
 

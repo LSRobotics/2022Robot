@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -49,10 +52,16 @@ public class Robot extends TimedRobot {
   MotorControllerGroup right_motors;
   DifferentialDrive drive;
   
-  public static WPI_TalonFX fl_drive;
-  public static WPI_TalonFX fr_drive;
-  public static WPI_TalonFX bl_drive;
-  public static WPI_TalonFX br_drive;
+  public WPI_TalonFX fl_drive;
+  public WPI_TalonFX fr_drive;
+  public WPI_TalonFX bl_drive;
+  public WPI_TalonFX br_drive;
+
+  public CANSparkMax intake;
+  public CANSparkMax shooter;
+  public CANSparkMax index;
+
+
 
   public XboxController gp;
 
@@ -169,6 +178,20 @@ public class Robot extends TimedRobot {
     
     if(gp.getXButtonPressed())
       Camera.changeCam();
+
+    shooter.set(gp.getRightY());
+
+    if(gp.getAButton()){
+      index.set(Statics.Index_Speed);
+    } else {
+      index.set(0);
+    }
+
+    if(gp.getBButton()){
+      intake.set(Statics.Intake_Speed);
+    } else {
+      intake.set(0);
+    }
   }
 
   /** This function is called once when the robot is disabled. */
@@ -191,16 +214,18 @@ public class Robot extends TimedRobot {
     gp = new XboxController(Statics.XboxController_ID);
   }
 
-  private static void initializeMotorControllers() {
+  private void initializeMotorControllers() {
+
     fl_drive = new WPI_TalonFX(Statics.Front_Left_Motor_ID);
     fr_drive = new WPI_TalonFX(Statics.Front_Right_Motor_ID);
     bl_drive = new WPI_TalonFX(Statics.Back_Left_Motor_ID);
     br_drive = new WPI_TalonFX(Statics.Back_Right_Motor_ID);
+
+    shooter = new CANSparkMax(Statics.Shooter_Motor_ID, MotorType.kBrushless);
+    intake = new CANSparkMax(Statics.Intake_Motor_ID, MotorType.kBrushed);
+    index = new CANSparkMax(Statics.Index_Motor_ID, MotorType.kBrushed);
   }
 
-
-
-  
 
 
   public double getRangeInches(double rawVoltage){

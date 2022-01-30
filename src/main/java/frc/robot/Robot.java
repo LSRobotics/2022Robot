@@ -181,7 +181,8 @@ public class Robot extends TimedRobot {
 
     shooter.set(gp.getRightY());
 
-    if(gp.getAButton()){
+
+    if(gp.getAButton() && shooter.getEncoder().getVelocity() ==  Statics.Shooter_Target_RPM){
       index.set(Statics.Index_Speed);
     } else {
       index.set(0);

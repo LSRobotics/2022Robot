@@ -74,7 +74,8 @@ public class Robot extends TimedRobot {
   
 
   //public VictorSPX motor1;
-  ShuffleboardTab tab = Shuffleboard.getTab("Values");
+  ShuffleboardTab tab = Shuffleboard.getTab("Test Board");
+  ShuffleboardTab tab2 = Shuffleboard.getTab("Competition Board");
   NetworkTableEntry rightMotorNetworkTable;
   NetworkTableEntry leftMotorNetworkTable;
   NetworkTableEntry ultrasonicDistance;
@@ -126,11 +127,43 @@ public class Robot extends TimedRobot {
 
     cameraTest = tab.add("camera", 0)
     .withWidget(BuiltInWidgets.kCameraStream)
-    .withSize( 5, 5)
-    .withPosition(7 , 7)
+    .withSize( 1, 1)
+    .withPosition(0 , 4)
     .getEntry();
 
-    //shuffleboardGo();
+
+    //Start of competition tab stuff
+    rightMotorNetworkTable = tab2.add("Right Motor Value", 1)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
+    .withSize(2, 1)
+    .withPosition(0, 0)
+    .getEntry();   
+
+    leftMotorNetworkTable  = tab2.add("Left Motor Value", 1)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
+    .withSize(2, 1)
+    .withPosition(2, 0)
+    .getEntry(); 
+    
+    ultrasonicDistance = tab2.add("Distance to target", 0)
+    .withWidget(BuiltInWidgets.kDial)
+    .withSize(3, 2)
+    .withPosition(0, 3)
+    .getEntry();
+
+    pdpVoltage = tab2.add("PDP voltage", 0)
+    .withWidget(BuiltInWidgets.kVoltageView)
+    .withSize(1, 1)
+    .withPosition(5, 0)
+    .getEntry();
+
+    cameraTest = tab2.add("camera", 0)
+    .withWidget(BuiltInWidgets.kCameraStream)
+    .withSize( 1, 1)
+    .withPosition(0 , 4)
+    .getEntry();
+
+    
     Camera.startCameras();
     
 

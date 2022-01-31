@@ -6,11 +6,12 @@ package frc.robot;
 
 /** Add your docs here. */
 public class Statics {
-    public final static int Front_Left_Motor_ID = 1;
-    public final static int Front_Right_Motor_ID = 2;
+    public final static int Front_Left_Motor_ID = 4;
+    public final static int Front_Right_Motor_ID = 1;
     public final static int Back_Left_Motor_ID = 3;
-    public final static int Back_Right_Motor_ID = 4;
+    public final static int Back_Right_Motor_ID = 2;
 
     public final static int XboxController_ID = 0;
 
+    public final static double SensorToMeters = 45347.75; 
 }

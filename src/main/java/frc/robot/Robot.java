@@ -46,9 +46,15 @@ public class Robot extends TimedRobot {
 
   private PIDController movePid;
   private PIDController gyroPid;
-  private static final int P = 1;
-  private static final int I = 0;
-  private static final int D = 0;
+  private static final int mP = 1; //TODO: move these to statics file
+  private static final int mI = 0;
+  private static final int mD = 0;
+
+  private static final int gP = 1;
+  private static final int gI = 0;
+  private static final int gD = 0;
+  
+
 
   private int autoIncrement;
 
@@ -88,11 +94,12 @@ public class Robot extends TimedRobot {
     drive = new DifferentialDrive(left_motors, right_motors);
 
 
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
+    m_chooser.setDefaultOption("Test Auton", kCustomAuto);
+    m_chooser.addOption("Main Auton", kDefaultAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    movePid = new PIDController(P,I,D); //TODO: figure out the kP, kI, and kD values required for actual instantiation
+    movePid = new PIDController(mP,mI,mD); //TODO: figure out the kP, kI, and kD values required for actual instantiation
+    gyroPid = new PIDController(gP,gI,gD); //TODO: figure out the kP, kI, and kD values required for actual instantiation
 
     ahrs = new AHRS(SPI.Port.kMXP);
 
@@ -120,6 +127,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
+    drive.arcadeDrive(0,0);
     switch (m_autoSelected) {
       case kCustomAuto: //Development Auton
 
@@ -137,10 +145,10 @@ public class Robot extends TimedRobot {
           */
           switch (autoIncrement) {
             case 0:
-              setAuton(AutonMode.DRIVE, 3);
+              setAuton(AutonMode.DRIVE, .5);
               break;
             case 1:
-              setAuton(AutonMode.TURN, 5);
+              setAuton(AutonMode.TURN, .5);
               break;
           }
 
@@ -155,22 +163,27 @@ public class Robot extends TimedRobot {
           case DRIVE: 
             double error = ahrs.getAngle();
             double turn = error;
-            drive.arcadeDrive(movePid.calculate(getAverageEncoderDistance()-autonStartingPos), turn); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
+            drive.arcadeDrive(MathUtil.clamp(movePid.calculate((getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters), -.4, .4), 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
+            System.out.println((getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters);
 
             if (movePid.atSetpoint()) {
               autonConditionCompleted = true;
+              System.out.println("this finished");
             }
             break;
           /* TURN MODE 
            - Turns some distance in degrees
           */
           case TURN: 
-            double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -1.0, 1.0);
+            double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
             drive.arcadeDrive(0,currentRotationRate);
 
             if (gyroPid.atSetpoint()) {
               autonConditionCompleted = true;
             }
+            break;
+          default:
+            drive.arcadeDrive(0,0);
             break;
         }
 
@@ -188,6 +201,10 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     drive.arcadeDrive(gp.getRightTriggerAxis()-gp.getLeftTriggerAxis(), gp.getLeftX());
+
+    if (gp.getAButton()) {
+      System.out.println(getAverageEncoderDistance());
+    }
   }
 
   @Override
@@ -211,6 +228,9 @@ public class Robot extends TimedRobot {
     fr_drive = new WPI_TalonFX(Statics.Front_Right_Motor_ID);
     bl_drive = new WPI_TalonFX(Statics.Back_Left_Motor_ID);
     br_drive = new WPI_TalonFX(Statics.Back_Right_Motor_ID);
+
+    fr_drive.setInverted(true);
+    br_drive.setInverted(true);
   }
 
   private void setAuton(AutonMode mode, double targetValue) {

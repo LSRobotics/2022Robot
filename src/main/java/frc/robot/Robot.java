@@ -75,7 +75,7 @@ public class Robot extends TimedRobot {
 
   public XboxController gp;
 
-  double shooterSpeed = 0.5;
+  double shooterSpeed = Statics.Shooter_Speed;
 
   double speed;
 
@@ -121,8 +121,7 @@ public class Robot extends TimedRobot {
     
     ultrasonic = new AnalogInput(Statics.ultrasonic);
 
-    ShuffleboardJunk();
-    
+    shuffleboardStartup();
 
   }
 
@@ -187,7 +186,7 @@ public class Robot extends TimedRobot {
 
 
 
-    if(gp.getAButton() && shooter.getEncoder().getVelocity() ==  Statics.Shooter_Target_RPM){
+    if(gp.getAButton() && shooter.getEncoder().getVelocity() == Statics.Shooter_Target_RPM){
       index.set(Statics.Index_Speed);
     } else {
       index.set(0);
@@ -291,7 +290,7 @@ public class Robot extends TimedRobot {
     
   }
   
-  public void ShuffleboardJunk(){
+  public void shuffleboardStartup(){
     rightMotorNetworkTable = testTab.add("Right Motor Value", 1)
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)

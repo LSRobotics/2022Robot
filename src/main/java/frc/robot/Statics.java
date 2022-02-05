@@ -18,6 +18,7 @@ public class Statics {
 
     //Just for now
     public final static double Shooter_Target_RPM = 1000;
+    public final static double Shooter_Speed = 0.5;
     
 
     //weight for cubic function

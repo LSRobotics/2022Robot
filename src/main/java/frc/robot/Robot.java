@@ -74,6 +74,8 @@ public class Robot extends TimedRobot {
 
   public XboxController gp;
 
+  double shooterSpeed = 0.5;
+
   double speed;
 
 
@@ -168,7 +170,20 @@ public class Robot extends TimedRobot {
     if(gp.getXButtonPressed())
       Camera.changeCam();
 
-    shooter.set(gp.getRightY());
+    if(gp.getYButton()) {
+      shooter.set(shooterSpeed);
+    } else {
+      shooter.set(0);
+    }
+
+    if (gp.getRightBumperPressed()){
+      shooterSpeed += 0.05;
+    }
+    
+    if (gp.getLeftBumperPressed()){
+      shooterSpeed -= 0.05;
+    }
+
 
 
     if(gp.getAButton() && shooter.getEncoder().getVelocity() ==  Statics.Shooter_Target_RPM){

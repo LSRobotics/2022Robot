@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -125,11 +126,11 @@ public class Robot extends TimedRobot {
     .withPosition(5, 0)
     .getEntry();
 
-    cameraTest = tab.add("camera", 0)
+    tab.add("camera", new UsbCamera("cam1", 0))
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize( 1, 1)
-    .withPosition(0 , 4)
-    .getEntry();
+    .withPosition(0 , 4);
+    
 
 
     //Start of competition tab stuff

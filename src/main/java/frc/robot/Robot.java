@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -65,6 +66,11 @@ public class Robot extends TimedRobot {
   double distance;
   double leftMotorN;
   double rightMotorN;
+  double shooterN;
+  double intakeN;
+  double indexN;
+  double shooterRPM;
+  double navXAngle;
 
   public XboxController gp;
 
@@ -83,7 +89,14 @@ public class Robot extends TimedRobot {
   NetworkTableEntry leftMotorNetworkTable;
   NetworkTableEntry ultrasonicDistance;
   NetworkTableEntry pdpVoltage;
+  NetworkTableEntry ShooterTable;
+  NetworkTableEntry IndexTable;
+  NetworkTableEntry IntakeTable;
+  NetworkTableEntry shooterRPMEntry;
+  SimpleWidget navXEntry;
   ComplexWidget cameraTest;
+
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -219,9 +232,15 @@ public class Robot extends TimedRobot {
     rightMotorNetworkTable.setDouble(rightMotorN);
     leftMotorNetworkTable.setDouble(leftMotorN);
 
-    
+    IndexTable.setDouble(indexN);
+    ShooterTable.setDouble(shooterN);
+    IntakeTable.setDouble(intakeN);
 
-    //SmartDashboard.putNumber("NAVX Z-Axis", navx.getYaw()); navX code needed
+    shooterRPMEntry.setDouble(shooterRPM);
+    
+    
+    //navXEntry.setDouble(navXAngle)
+    
   }
   public void updateInputs(){
     
@@ -229,6 +248,15 @@ public class Robot extends TimedRobot {
     distance = getRangeInches(ultrasonic.getValue());
     leftMotorN = fl_drive.get();
     rightMotorN = fr_drive.get();
+
+    shooterN = shooter.get();
+    indexN = index.get();
+    intakeN = intake.get();
+
+    shooterRPM = shooter.getEncoder().getVelocity();
+    
+    //navXAngle = navX.getAngle();
+    
   }
   
   public void ShuffleboardJunk(){
@@ -269,13 +297,13 @@ public class Robot extends TimedRobot {
 
     //Start of competition tab stuff
     rightMotorNetworkTable = compTab.add("Right Motor Value", 1)
-    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
+    .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)
     .withPosition(0, 0)
     .getEntry();   
 
     leftMotorNetworkTable  = compTab.add("Left Motor Value", 1)
-    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
+    .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)
     .withPosition(2, 0)
     .getEntry(); 
@@ -287,7 +315,7 @@ public class Robot extends TimedRobot {
     .getEntry();
 
     pdpVoltage = compTab.add("PDP voltage", 0)
-    .withWidget(BuiltInWidgets.kVoltageView)
+    .withWidget(BuiltInWidgets.kPowerDistribution)
     .withSize(1, 1)
     .withPosition(7, 0)
     .getEntry();
@@ -301,6 +329,49 @@ public class Robot extends TimedRobot {
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize(1,1)
     .withPosition(4,2);
+
+    compTab.add("Differential Drive", drive)
+    .withWidget(BuiltInWidgets.kDifferentialDrive)
+    .withSize(1,1)
+    .withPosition(2,2);
+
+    shooterRPMEntry = compTab.add("Shooter RPM", 0)
+    .withWidget(BuiltInWidgets.kNumberBar)
+    .withSize(1,1)
+    .withPosition(7, 1)
+    .getEntry();
+
+    IntakeTable = compTab.add("Intake", 0)
+    .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", -1, "max", 1))
+    .withSize(1, 1)
+    .withPosition(7, 3)
+    .getEntry();
+
+    ShooterTable = compTab.add("Shooter", 0)
+    .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", -1, "max", 1))
+    .withSize(1, 1)
+    .withPosition(6, 3)
+    .getEntry();
+
+    IndexTable = compTab.add("Index", 0)
+    .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", -1, "max", 1))
+    .withSize(1, 1)
+    .withPosition(7, 4)
+    .getEntry();
+
+    /*
+    compTab.add("navX Angle", navX)
+    .withWidget(BuiltInWidgets.kGyro)
+    .withSize(1,1)
+    .withPosition(3, 3);
+
+    OR (Need to check both)
+    
+    navXEntry = compTab.add("navX Angle", 0)
+    .withWidget(BuiltInWidgets.kGyro)
+    .withSize(1,1)
+    .withPosition(3, 3);
+    */
   }
   
   

@@ -149,7 +149,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    drive.arcadeDrive(gp.getRightTriggerAxis()-gp.getLeftTriggerAxis(), gp.getLeftX());
+    
+    driveTrain();
     
     if(gp.getXButtonPressed())
       Camera.changeCam();
@@ -203,16 +204,30 @@ public class Robot extends TimedRobot {
   }
 
 
+  private void driveTrain() {
+    drive.arcadeDrive(cubicScaledDeadband(gp.getLeftY(), Statics.deadbandCutoff, Statics.Weight),
+                      cubicScaledDeadband(gp.getRightX(), Statics.deadbandCutoff, Statics.Weight));
+
+  }
+
+  private double cubic(double x, double w){
+    return w * x * x * x  + (1.0 - w) * x;
+  }
+
 
   public double getRangeInches(double rawVoltage){
     return rawVoltage * Statics.cm_to_in;
   }
 
+  public double cubicScaledDeadband(double x, double deadbandCutoff, double weight){
+    if (Math.abs(x) < deadbandCutoff) {
+      return 0;
+    } else {
+      return (cubic(x, weight)- (Math.abs(x)/x)* cubic(deadbandCutoff, weight)) / (1.0 - cubic(deadbandCutoff, weight));
+    }
+  }
 
-
-  public void updateNetworkEntries(){  
-    
-
+  public void updateNetworkEntries(){
     
     pdpVoltage.setDouble(pdpNum);
     ultrasonicDistance.setDouble(distance);

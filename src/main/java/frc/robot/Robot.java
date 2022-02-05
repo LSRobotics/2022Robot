@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -37,7 +36,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 //import com.kauailabs.navx.frc.AHRS;
 //import com.ctre.phoenix.motorcontrol.NeutralMode;
 
-
+;
 
 
 
@@ -62,7 +61,10 @@ public class Robot extends TimedRobot {
   public CANSparkMax shooter;
   public CANSparkMax index;
 
-
+  double pdpNum;
+  double distance;
+  double leftMotorN;
+  double rightMotorN;
 
   public XboxController gp;
 
@@ -75,8 +77,8 @@ public class Robot extends TimedRobot {
   
 
   //public VictorSPX motor1;
-  ShuffleboardTab tab = Shuffleboard.getTab("Test Board");
-  ShuffleboardTab tab2 = Shuffleboard.getTab("Competition Board");
+  ShuffleboardTab testTab = Shuffleboard.getTab("Test Board");
+  ShuffleboardTab compTab = Shuffleboard.getTab("Competition Board");
   NetworkTableEntry rightMotorNetworkTable;
   NetworkTableEntry leftMotorNetworkTable;
   NetworkTableEntry ultrasonicDistance;
@@ -89,6 +91,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     
+    Camera.startCameras();
 
     initializeMotorControllers();
 
@@ -102,70 +105,70 @@ public class Robot extends TimedRobot {
     
     ultrasonic = new AnalogInput(Statics.ultrasonic);
 
-    rightMotorNetworkTable = tab.add("Right Motor Value", 1)
+    rightMotorNetworkTable = testTab.add("Right Motor Value", 1)
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)
     .withPosition(0, 0)
     .getEntry();   
 
-    leftMotorNetworkTable  = tab.add("Left Motor Value", 1)
+    leftMotorNetworkTable  = testTab.add("Left Motor Value", 1)
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)
     .withPosition(2, 0)
     .getEntry(); 
     
-    ultrasonicDistance = tab.add("Distance to target", 0)
+    ultrasonicDistance = testTab.add("Distance to target", 0)
     .withWidget(BuiltInWidgets.kDial)
     .withSize(3, 2)
     .withPosition(0, 3)
     .getEntry();
 
-    pdpVoltage = tab.add("PDP voltage", 0)
+    pdpVoltage = testTab.add("PDP voltage", 0)
     .withWidget(BuiltInWidgets.kVoltageView)
     .withSize(1, 1)
     .withPosition(5, 0)
     .getEntry();
 
-    tab.add("camera", new UsbCamera("cam1", 0))
+    testTab.add("camera", Camera.cam0)
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize( 1, 1)
-    .withPosition(0 , 4);
+    .withPosition(4 , 0);
     
 
 
     //Start of competition tab stuff
-    rightMotorNetworkTable = tab2.add("Right Motor Value", 1)
+    rightMotorNetworkTable = compTab.add("Right Motor Value", 1)
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)
     .withPosition(0, 0)
     .getEntry();   
 
-    leftMotorNetworkTable  = tab2.add("Left Motor Value", 1)
+    leftMotorNetworkTable  = compTab.add("Left Motor Value", 1)
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)
     .withPosition(2, 0)
     .getEntry(); 
     
-    ultrasonicDistance = tab2.add("Distance to target", 0)
+    ultrasonicDistance = compTab.add("Distance to target", 0)
     .withWidget(BuiltInWidgets.kDial)
     .withSize(3, 2)
     .withPosition(0, 3)
     .getEntry();
 
-    pdpVoltage = tab2.add("PDP voltage", 0)
+    pdpVoltage = compTab.add("PDP voltage", 0)
     .withWidget(BuiltInWidgets.kVoltageView)
     .withSize(1, 1)
     .withPosition(5, 0)
     .getEntry();
 
-    cameraTest = tab2.add("camera", 0)
+    cameraTest = compTab.add("camera", 0)
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize( 1, 1)
     .withPosition(0 , 4)
     .getEntry();
 
     
-    Camera.startCameras();
+    
     
 
   }
@@ -179,6 +182,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {   
+    updateInputs();
     shuffleboardGo();
     
   }
@@ -269,11 +273,7 @@ public class Robot extends TimedRobot {
 
 
 
-  public void shuffleboardGo(){
-    double pdpNum = pdp.getVoltage();
-    double distance = getRangeInches(ultrasonic.getValue());
-    double leftMotorN = fl_drive.get();
-    double rightMotorN = fl_drive.get();
+  public void shuffleboardGo(){  
     
     pdpVoltage.setDouble(pdpNum);
     ultrasonicDistance.setDouble(distance);
@@ -288,7 +288,13 @@ public class Robot extends TimedRobot {
 
     //SmartDashboard.putNumber("NAVX Z-Axis", navx.getYaw()); navX code needed
   }
-
+  public void updateInputs(){
+    
+    pdpNum = pdp.getVoltage();
+    distance = getRangeInches(ultrasonic.getValue());
+    leftMotorN = fl_drive.get();
+    rightMotorN = fr_drive.get();
+  }
   
   
   

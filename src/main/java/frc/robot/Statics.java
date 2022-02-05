@@ -11,6 +11,7 @@ public class Statics {
     public final static int Front_Right_Motor_ID = 2;
     public final static int Back_Left_Motor_ID = 3;
     public final static int Back_Right_Motor_ID = 4;
+    public final static int ClimbMotorID = 9; 
 
     public final static double Index_Speed = .5;
     public final static double Intake_Speed = .5;

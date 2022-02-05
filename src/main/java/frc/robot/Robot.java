@@ -57,6 +57,7 @@ public class Robot extends TimedRobot {
   public WPI_TalonFX fr_drive;
   public WPI_TalonFX bl_drive;
   public WPI_TalonFX br_drive;
+  public WPI_TalonFX climbMechanism;
 
   public CANSparkMax intake;
   public CANSparkMax shooter;
@@ -210,6 +211,7 @@ public class Robot extends TimedRobot {
     fr_drive = new WPI_TalonFX(Statics.Front_Right_Motor_ID);
     bl_drive = new WPI_TalonFX(Statics.Back_Left_Motor_ID);
     br_drive = new WPI_TalonFX(Statics.Back_Right_Motor_ID);
+    climbMechanism = new WPI_TalonFX(Statics.ClimbMotorID);
 
     shooter = new CANSparkMax(Statics.Shooter_Motor_ID, MotorType.kBrushless);
     intake = new CANSparkMax(Statics.Intake_Motor_ID, MotorType.kBrushed);

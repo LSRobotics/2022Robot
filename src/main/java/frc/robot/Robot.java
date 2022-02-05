@@ -12,7 +12,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -106,69 +105,7 @@ public class Robot extends TimedRobot {
     
     ultrasonic = new AnalogInput(Statics.ultrasonic);
 
-    rightMotorNetworkTable = testTab.add("Right Motor Value", 1)
-    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
-    .withSize(2, 1)
-    .withPosition(0, 0)
-    .getEntry();   
-
-    leftMotorNetworkTable  = testTab.add("Left Motor Value", 1)
-    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
-    .withSize(2, 1)
-    .withPosition(2, 0)
-    .getEntry(); 
-    
-    ultrasonicDistance = testTab.add("Distance to target", 0)
-    .withWidget(BuiltInWidgets.kDial)
-    .withSize(3, 2)
-    .withPosition(0, 3)
-    .getEntry();
-
-    pdpVoltage = testTab.add("PDP voltage", 0)
-    .withWidget(BuiltInWidgets.kVoltageView)
-    .withSize(1, 1)
-    .withPosition(5, 0)
-    .getEntry();
-
-    testTab.add("camera", Camera.cam0)
-    .withWidget(BuiltInWidgets.kCameraStream)
-    .withSize( 1, 1)
-    .withPosition(4 , 0);
-    
-
-
-    //Start of competition tab stuff
-    rightMotorNetworkTable = compTab.add("Right Motor Value", 1)
-    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
-    .withSize(2, 1)
-    .withPosition(0, 0)
-    .getEntry();   
-
-    leftMotorNetworkTable  = compTab.add("Left Motor Value", 1)
-    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
-    .withSize(2, 1)
-    .withPosition(2, 0)
-    .getEntry(); 
-    
-    ultrasonicDistance = compTab.add("Distance to target", 0)
-    .withWidget(BuiltInWidgets.kDial)
-    .withSize(3, 2)
-    .withPosition(0, 3)
-    .getEntry();
-
-    pdpVoltage = compTab.add("PDP voltage", 0)
-    .withWidget(BuiltInWidgets.kVoltageView)
-    .withSize(1, 1)
-    .withPosition(5, 0)
-    .getEntry();
-
-    cameraTest = compTab.add("camera",Camera.cam0)
-    .withWidget(BuiltInWidgets.kCameraStream)
-    .withSize( 1, 1)
-    .withPosition(0 , 4);
-
-    
-    
+    ShuffleboardJunk();
     
 
   }
@@ -183,7 +120,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {   
     updateInputs();
-    shuffleboardGo();
+    updateNetworkEntries();
     
   }
   /**
@@ -273,18 +210,16 @@ public class Robot extends TimedRobot {
 
 
 
-  public void shuffleboardGo(){  
+  public void updateNetworkEntries(){  
+    
+
     
     pdpVoltage.setDouble(pdpNum);
     ultrasonicDistance.setDouble(distance);
     rightMotorNetworkTable.setDouble(rightMotorN);
     leftMotorNetworkTable.setDouble(leftMotorN);
 
-    SmartDashboard.putNumber("Left Motor",fl_drive.get());  
-    SmartDashboard.putNumber("Right Motor", fr_drive.get());
-
-    SmartDashboard.putNumber("Voltage", pdp.getVoltage());
-    SmartDashboard.putNumber("Ultrasonic Distance", getRangeInches(ultrasonic.getValue()));
+    
 
     //SmartDashboard.putNumber("NAVX Z-Axis", navx.getYaw()); navX code needed
   }
@@ -296,6 +231,77 @@ public class Robot extends TimedRobot {
     rightMotorN = fr_drive.get();
   }
   
+  public void ShuffleboardJunk(){
+    rightMotorNetworkTable = testTab.add("Right Motor Value", 1)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
+    .withSize(2, 1)
+    .withPosition(0, 0)
+    .getEntry();   
+
+    leftMotorNetworkTable  = testTab.add("Left Motor Value", 1)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
+    .withSize(2, 1)
+    .withPosition(2, 0)
+    .getEntry(); 
+    
+    ultrasonicDistance = testTab.add("Distance to target", 0)
+    .withWidget(BuiltInWidgets.kDial)
+    .withSize(3, 2)
+    .withPosition(0, 3)
+    .getEntry();
+
+    pdpVoltage = testTab.add("PDP voltage", 0)
+    .withWidget(BuiltInWidgets.kVoltageView)
+    .withSize(1, 1)
+    .withPosition(7, 0)
+    .getEntry();
+
+    testTab.add("camera", Camera.cam0)
+    .withWidget(BuiltInWidgets.kCameraStream)
+    .withSize( 1, 1)
+    .withPosition(4 , 0);
+    
+    testTab.add("camera dos", Camera.cam1)
+    .withWidget(BuiltInWidgets.kCameraStream)
+    .withSize(1,1)
+    .withPosition(4,2);
+
+
+    //Start of competition tab stuff
+    rightMotorNetworkTable = compTab.add("Right Motor Value", 1)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
+    .withSize(2, 1)
+    .withPosition(0, 0)
+    .getEntry();   
+
+    leftMotorNetworkTable  = compTab.add("Left Motor Value", 1)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
+    .withSize(2, 1)
+    .withPosition(2, 0)
+    .getEntry(); 
+    
+    ultrasonicDistance = compTab.add("Distance to target", 0)
+    .withWidget(BuiltInWidgets.kDial)
+    .withSize(3, 2)
+    .withPosition(0, 3)
+    .getEntry();
+
+    pdpVoltage = compTab.add("PDP voltage", 0)
+    .withWidget(BuiltInWidgets.kVoltageView)
+    .withSize(1, 1)
+    .withPosition(7, 0)
+    .getEntry();
+
+    cameraTest = compTab.add("camera",Camera.cam0)
+    .withWidget(BuiltInWidgets.kCameraStream)
+    .withSize( 2, 2)
+    .withPosition(4 , 0);
+
+    compTab.add("Camera Numero Two",Camera.cam1)
+    .withWidget(BuiltInWidgets.kCameraStream)
+    .withSize(1,1)
+    .withPosition(4,2);
+  }
   
   
 }

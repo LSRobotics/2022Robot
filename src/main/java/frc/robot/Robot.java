@@ -14,6 +14,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -83,7 +84,7 @@ public class Robot extends TimedRobot {
   NetworkTableEntry leftMotorNetworkTable;
   NetworkTableEntry ultrasonicDistance;
   NetworkTableEntry pdpVoltage;
-  NetworkTableEntry cameraTest;
+  ComplexWidget cameraTest;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -161,11 +162,10 @@ public class Robot extends TimedRobot {
     .withPosition(5, 0)
     .getEntry();
 
-    cameraTest = compTab.add("camera", 0)
+    cameraTest = compTab.add("camera",Camera.cam0)
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize( 1, 1)
-    .withPosition(0 , 4)
-    .getEntry();
+    .withPosition(0 , 4);
 
     
     

@@ -172,9 +172,20 @@ public class Robot extends TimedRobot {
 
     if(gp.getYButton()) {
       shooter.set(shooterSpeed);
-    } else {
+      
+      if (shooter.getEncoder().getVelocity() == Statics.Shooter_Target_RPM)
+        index.set(Statics.Index_Speed);
+    } 
+    else {
       shooter.set(0);
+      index.set(0);
     }
+    
+    
+     
+      
+    
+
 
     if (gp.getRightBumperPressed()){
       shooterSpeed += 0.05;
@@ -186,11 +197,7 @@ public class Robot extends TimedRobot {
 
 
 
-    if(gp.getAButton() && shooter.getEncoder().getVelocity() == Statics.Shooter_Target_RPM){
-      index.set(Statics.Index_Speed);
-    } else {
-      index.set(0);
-    }
+    
 
     if(gp.getBButton()){
       intake.set(Statics.Intake_Speed);

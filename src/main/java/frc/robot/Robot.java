@@ -172,7 +172,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     
     driveTrain();
-    setIndexerPosition(gp.getAButtonPressed(), gp.getBButtonPressed());    
+    setIntakerPosition(gp.getAButtonPressed(), gp.getBButtonPressed());    
 
 
     if(gp.getXButtonPressed())
@@ -299,30 +299,28 @@ public class Robot extends TimedRobot {
   }
 
   //If button is pressed move until limit switch
-  public void setIndexerPosition(boolean left, boolean right){
+  public void setIntakerPosition(boolean left, boolean right){
 
+      //Controls actual intake - only on if at bottom
       if (bottomLimitSwitch.get() && left) {
-        intakeUpDown.set(0);
         intake.set(Statics.Intake_Speed);
       }
-      else if(left) {
-        intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
-        intake.set(0);
-      }
       else {
-        intakeUpDown.set(0);
         intake.set(0);
       }
 
-
+      //defaults movement to go up - if B button - go up until limit switch
       if (!topLimitSwitch.get() && right) 
         goingUp = true;
       else if (topLimitSwitch.get())
         goingUp = false;
 
+        //If we're not going up, figure out if we want to go down until bottom limit switch
       if (goingUp)
         intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-       else 
+        else if (!bottomLimitSwitch.get() && left)
+        intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
+        else 
          intakeUpDown.set(0);
   }
   

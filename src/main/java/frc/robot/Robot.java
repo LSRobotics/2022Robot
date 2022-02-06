@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import java.util.*;
 
@@ -62,6 +63,7 @@ public class Robot extends TimedRobot {
   public CANSparkMax intake;
   public CANSparkMax shooter;
   public CANSparkMax index;
+  public CANSparkMax intakeUpDown;
 
   double pdpNum;
   double distance;
@@ -79,10 +81,14 @@ public class Robot extends TimedRobot {
 
   double speed;
 
+  boolean goingUp = false;
+
 
   public PowerDistribution pdp;
 
   AnalogInput ultrasonic;  
+  DigitalInput bottomLimitSwitch = new DigitalInput(0);
+  DigitalInput topLimitSwitch = new DigitalInput(1);
   
 
   //public VictorSPX motor1;
@@ -166,7 +172,9 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     
     driveTrain();
-    
+    setIndexerPosition(gp.getAButtonPressed(), gp.getBButtonPressed());    
+
+
     if(gp.getXButtonPressed())
       Camera.changeCam();
 
@@ -181,11 +189,6 @@ public class Robot extends TimedRobot {
       index.set(0);
     }
     
-    
-     
-      
-    
-
 
     if (gp.getRightBumperPressed()){
       shooterSpeed += 0.05;
@@ -195,15 +198,13 @@ public class Robot extends TimedRobot {
       shooterSpeed -= 0.05;
     }
 
-
-
-    
-
+    /* Could be Useful for testing - only for intake
     if(gp.getBButton()){
       intake.set(Statics.Intake_Speed);
     } else {
       intake.set(0);
     }
+    */
   }
 
   /** This function is called once when the robot is disabled. */
@@ -295,6 +296,34 @@ public class Robot extends TimedRobot {
     
     //navXAngle = navX.getAngle();
     
+  }
+
+  //If button is pressed move until limit switch
+  public void setIndexerPosition(boolean left, boolean right){
+
+      if (bottomLimitSwitch.get() && left) {
+        intakeUpDown.set(0);
+        intake.set(Statics.Intake_Speed);
+      }
+      else if(left) {
+        intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
+        intake.set(0);
+      }
+      else {
+        intakeUpDown.set(0);
+        intake.set(0);
+      }
+
+
+      if (!topLimitSwitch.get() && right) 
+        goingUp = true;
+      else if (topLimitSwitch.get())
+        goingUp = false;
+
+      if (goingUp)
+        intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
+       else 
+         intakeUpDown.set(0);
   }
   
   public void shuffleboardStartup(){

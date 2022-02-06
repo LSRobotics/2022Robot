@@ -5,13 +5,12 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
@@ -26,10 +25,6 @@ import edu.wpi.first.wpilibj.SPI; //TODO: change the port system depending on wh
  * project.
  */
 public class Robot extends TimedRobot {
-
-
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
 
   MotorControllerGroup left_motors;
   MotorControllerGroup right_motors;
@@ -53,19 +48,17 @@ public class Robot extends TimedRobot {
   private static final int gP = 1;
   private static final int gI = 0;
   private static final int gD = 0;
-  
 
+  private Timer debugTimer;
 
   private int autoIncrement;
-
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   private AHRS ahrs;
 
   private enum AutonMode {
     DRIVE, 
-    TURN
+    TURN,
+    NONE
   }
 
   private AutonMode currentAuton;
@@ -93,16 +86,12 @@ public class Robot extends TimedRobot {
     right_motors = new MotorControllerGroup(fr_drive, br_drive);
     drive = new DifferentialDrive(left_motors, right_motors);
 
-
-    m_chooser.setDefaultOption("Test Auton", kCustomAuto);
-    m_chooser.addOption("Main Auton", kDefaultAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
-
     movePid = new PIDController(mP,mI,mD); //TODO: figure out the kP, kI, and kD values required for actual instantiation
     gyroPid = new PIDController(gP,gI,gD); //TODO: figure out the kP, kI, and kD values required for actual instantiation
 
     ahrs = new AHRS(SPI.Port.kMXP);
 
+    debugTimer = new Timer();
   }
 
 
@@ -117,80 +106,79 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    autoIncrement = 0;
-    autonConditionCompleted = false;
-    currentAuton = AutonMode.DRIVE;
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
+    autoIncrement = -1;
+    autonConditionCompleted = true;
+    currentAuton = AutonMode.NONE;
+    debugTimer.reset();
+    debugTimer.start();
   }
 
   @Override
   public void autonomousPeriodic() {
-    drive.arcadeDrive(0,0);
-    switch (m_autoSelected) {
-      case kCustomAuto: //Development Auton
+    //When each step of autonomous is completed
+    System.out.println("**************************\nStart of Auton Periodic: " + debugTimer.get());
+    if (autonConditionCompleted) {
+      autoIncrement++;
 
-        //When each step of autonomous is completed
-        if (autonConditionCompleted) {
-          autoIncrement++;
-          
+      drive.setSafetyEnabled(false);
+      /* AUTO INCREMENT [PLACE AUTON INSTRUCTIONS HERE]
+        - each switch case is another instruction
+        - currently it is a switch statement and not an array to allow for some alternative functions to be called other than `set auton`
+        - SetAuton(AutonMode, targetValue) is the main function being used currently.
+          - Current AutonModes are `DRIVE` and `TURN`
+          - the targetValue is the value whatever the specific AutonMode is measuring should reach
+      */
+      switch (autoIncrement) {
+        case 0:
+          System.out.println("Pre-auton set: " + debugTimer.get());
+          setAuton(AutonMode.DRIVE, .5);
+          System.out.println("Post-auton set: " + debugTimer.get());
+          break;
+        case 1:
+          setAuton(AutonMode.TURN, .5);
+          break;
+      }
 
-          /* AUTO INCREMENT [PLACE AUTON INSTRUCTIONS HERE]
-            - each switch case is another instruction
-            - currently it is a switch statement and not an array to allow for some alternative functions to be called other than `set auton`
-            - SetAuton(AutonMode, targetValue) is the main function being used currently.
-              - Current AutonModes are `DRIVE` and `TURN`
-              - the targetValue is the value whatever the specific AutonMode is measuring should reach
-          */
-          switch (autoIncrement) {
-            case 0:
-              setAuton(AutonMode.DRIVE, .5);
-              break;
-            case 1:
-              setAuton(AutonMode.TURN, .5);
-              break;
-          }
+      autonConditionCompleted = false;
+    }
 
-          autonConditionCompleted = false;
+    switch (currentAuton) {
+      /* DRIVE MODE
+        - Drives forward some distance in **INSERT**UNITS**HERE**
+        - Uses the ahrs in order to ensure the robot drives straight
+      */
+      case DRIVE: 
+        System.out.println("Start of Drive: " + debugTimer.get());
+        //double error = ahrs.getAngle();
+        //double turn = error;
+        double valueToCalculate = (getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters;
+        System.out.println("Post Encoder Calc: " + debugTimer.get());
+        double rawValue = movePid.calculate(valueToCalculate);
+        System.out.println("Post PID calculate: " + debugTimer.get());
+        double driveValue = .4 * MathUtil.clamp(rawValue, -1, 1);
+        System.out.println("Post driveValue calc: " + debugTimer.get());
+        drive.arcadeDrive(driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
+        System.out.println("Post arcade drive: " + debugTimer.get());
+        if (movePid.atSetpoint()) {
+          autonConditionCompleted = true;
+          System.out.println("this finished");
         }
-
-        switch (currentAuton) {
-          /* DRIVE MODE
-           - Drives forward some distance in **INSERT**UNITS**HERE**
-           - Uses the ahrs in order to ensure the robot drives straight
-          */
-          case DRIVE: 
-            double error = ahrs.getAngle();
-            double turn = error;
-            drive.arcadeDrive(MathUtil.clamp(movePid.calculate((getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters), -.4, .4), 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
-            System.out.println((getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters);
-
-            if (movePid.atSetpoint()) {
-              autonConditionCompleted = true;
-              System.out.println("this finished");
-            }
-            break;
-          /* TURN MODE 
-           - Turns some distance in degrees
-          */
-          case TURN: 
-            double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
-            drive.arcadeDrive(0,currentRotationRate);
-
-            if (gyroPid.atSetpoint()) {
-              autonConditionCompleted = true;
-            }
-            break;
-          default:
-            drive.arcadeDrive(0,0);
-            break;
-        }
-
+        System.out.println("Post setpoint check: " + debugTimer.get());
         break;
-      case kDefaultAuto:
+      /* TURN MODE 
+        - Turns some distance in degrees
+      */
+      case TURN: 
+        double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
+        drive.arcadeDrive(0,currentRotationRate);
+
+        if (gyroPid.atSetpoint()) {
+          autonConditionCompleted = true;
+        }
+        break;
+      case NONE:
       default:
-        // Put default auto code here
+        drive.arcadeDrive(0,0);
         break;
     }
   }
@@ -204,6 +192,10 @@ public class Robot extends TimedRobot {
 
     if (gp.getAButton()) {
       System.out.println(getAverageEncoderDistance());
+      System.out.println("Front left: " + fl_drive.getSelectedSensorPosition());
+      System.out.println("Front right: " + fr_drive.getSelectedSensorPosition());
+      System.out.println("Back left: " + bl_drive.getSelectedSensorPosition());
+      System.out.println("Back right: " + br_drive.getSelectedSensorPosition());
     }
   }
 
@@ -237,15 +229,24 @@ public class Robot extends TimedRobot {
 
     currentAuton = mode;
     autonTarget = targetValue;
-    ahrs.reset();
 
     switch (mode) {
       case DRIVE:
-        movePid.setSetpoint(targetValue);
+        movePid.reset();
+        System.out.println("1: " + debugTimer.get());
         autonStartingPos = getAverageEncoderDistance();
+        System.out.println("2: " + debugTimer.get());
+        movePid.setSetpoint(targetValue + (autonStartingPos/Statics.SensorToMeters));
+        System.out.println("omegaBruh: " + debugTimer.get());
         break;
       case TURN:
+        ahrs.reset();
+        gyroPid.reset();
         gyroPid.setSetpoint(targetValue);
+        break;
+      case NONE:
+      default:
+        //just if there's nothing else to do
         break;
     }
 
@@ -256,10 +257,7 @@ public class Robot extends TimedRobot {
     - Returns a value in sensor units and must be converted (could change later)
   */
   private double getAverageEncoderDistance() {
-    double average;
-    average = (fl_drive.getSelectedSensorPosition() + fr_drive.getSelectedSensorPosition() + bl_drive.getSelectedSensorPosition() + br_drive.getSelectedSensorPosition())/4;
-    
-    return average;
+    return (fl_drive.getSelectedSensorPosition() + fr_drive.getSelectedSensorPosition() + bl_drive.getSelectedSensorPosition() + br_drive.getSelectedSensorPosition())/4;
   }
 
 }

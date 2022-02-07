@@ -171,7 +171,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     
-    driveTrain();
+    driveTrain(gp.getLeftY(), gp.getRightX());
     setIntakerPosition(gp.getAButtonPressed(), gp.getBButtonPressed());    
 
 
@@ -241,9 +241,9 @@ public class Robot extends TimedRobot {
   }
 
 
-  private void driveTrain() {
-    drive.arcadeDrive(cubicScaledDeadband(gp.getLeftY(), Statics.deadbandCutoff, Statics.Weight),
-                      cubicScaledDeadband(gp.getRightX(), Statics.deadbandCutoff, Statics.Weight));
+  private void driveTrain(double power, double turn) {
+    drive.arcadeDrive(cubicScaledDeadband(power, Statics.deadbandCutoff, Statics.Weight),
+                      cubicScaledDeadband(turn, Statics.deadbandCutoff, Statics.Weight));
 
   }
 

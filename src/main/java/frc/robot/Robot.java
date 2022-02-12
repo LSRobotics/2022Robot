@@ -41,13 +41,13 @@ public class Robot extends TimedRobot {
 
   private PIDController movePid;
   private PIDController gyroPid;
-  private static final int mP = 1; //TODO: move these to statics file
-  private static final int mI = 0;
-  private static final int mD = 0;
+  private static final double mP = 1.5; //TODO: move these to statics file
+  private static final double mI = 0;
+  private static final double mD = 0;
 
-  private static final int gP = 1;
-  private static final int gI = 0;
-  private static final int gD = 0;
+  private static final double gP = 1;
+  private static final double gI = 0;
+  private static final double gD = 0;
 
   private Timer debugTimer;
 
@@ -133,14 +133,18 @@ public class Robot extends TimedRobot {
         case 1:
           setAuton(AutonMode.TURN, .5);
           break;
+        default:
+          setAuton(AutonMode.NONE, 0);
+          break;
       }
 
       autonConditionCompleted = false;
-      System.out.println("This worked");
+      System.out.println("started next one");
+      System.out.println(debugTimer.get());
       drive.arcadeDrive(0,0);
+      System.out.println(debugTimer.get());
     }
     else {
-      System.out.println("I'm cool");
       switch (currentAuton) {
         // DRIVE MODE
         // - Drives forward some distance in **INSERT**UNITS**HERE**
@@ -152,7 +156,7 @@ public class Robot extends TimedRobot {
           
           double valueToCalculate = (getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters;
           double rawValue = movePid.calculate(valueToCalculate);
-          double driveValue = MathUtil.clamp(rawValue, -1, 1);
+          double driveValue = .4 * MathUtil.clamp(rawValue, -1, 1);
           drive.arcadeDrive(driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
           if (movePid.atSetpoint()) {
             autonConditionCompleted = true;
@@ -233,7 +237,6 @@ public class Robot extends TimedRobot {
         break;
       case TURN:
         ahrs.reset();
-        gyroPid.reset();
         gyroPid.setSetpoint(targetValue);
         break;
       case NONE:

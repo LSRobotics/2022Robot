@@ -76,7 +76,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-
     initializeMotorControllers();
 
     initializeGamePad();
@@ -115,17 +114,19 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     //When each step of autonomous is completed
+    drive.arcadeDrive(0, 0);
+    
     if (autonConditionCompleted) {
       autoIncrement++;
 
-      drive.setSafetyEnabled(false);
-      /* AUTO INCREMENT [PLACE AUTON INSTRUCTIONS HERE]
-        - each switch case is another instruction
-        - currently it is a switch statement and not an array to allow for some alternative functions to be called other than `set auton`
-        - SetAuton(AutonMode, targetValue) is the main function being used currently.
-          - Current AutonModes are `DRIVE` and `TURN`, with `NONE` being just to do nothing
-          - the targetValue is the value whatever the specific AutonMode is measuring should reach
-      */
+    
+      // AUTO INCREMENT [PLACE AUTON INSTRUCTIONS HERE]
+      // - each switch case is another instruction
+      // - currently it is a switch statement and not an array to allow for some alternative functions to be called other than `set auton`
+      // - SetAuton(AutonMode, targetValue) is the main function being used currently.
+      // - Current AutonModes are `DRIVE` and `TURN`, with `NONE` being just to do nothing
+      // - the targetValue is the value whatever the specific AutonMode is measuring should reach
+      
       switch (autoIncrement) {
         case 0:
           setAuton(AutonMode.DRIVE, .5);
@@ -137,14 +138,14 @@ public class Robot extends TimedRobot {
 
       autonConditionCompleted = false;
     }
+    
     else {
       switch (currentAuton) {
-        /* DRIVE MODE
-          - Drives forward some distance in **INSERT**UNITS**HERE**
-          - Uses the ahrs in order to ensure the robot drives straight
-        */
+        // DRIVE MODE
+        // - Drives forward some distance in **INSERT**UNITS**HERE**
+        // - Uses the ahrs in order to ensure the robot drives straight
         case DRIVE: 
-          System.out.println("Start of Drive: " + debugTimer.get());
+
           //double error = ahrs.getAngle();
           //double turn = error;
           double valueToCalculate = (getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters;
@@ -155,9 +156,8 @@ public class Robot extends TimedRobot {
             autonConditionCompleted = true;
           }
           break;
-        /* TURN MODE 
-          - Turns some distance in degrees
-        */
+        // TURN MODE 
+        // - Turns some distance in degrees
         case TURN: 
           double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
           drive.arcadeDrive(0,currentRotationRate);
@@ -172,6 +172,7 @@ public class Robot extends TimedRobot {
           break;
       }
     }
+    
   }
 
   @Override
@@ -218,6 +219,8 @@ public class Robot extends TimedRobot {
 
   private void setAuton(AutonMode mode, double targetValue) {
 
+
+    /*
     currentAuton = mode;
     autonTarget = targetValue;
 
@@ -237,6 +240,7 @@ public class Robot extends TimedRobot {
         //just if there's nothing else to do
         break;
     }
+    */
 
   }
 

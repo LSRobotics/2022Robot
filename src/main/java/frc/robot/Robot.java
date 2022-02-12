@@ -114,7 +114,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     //When each step of autonomous is completed
-    drive.arcadeDrive(0, 0);
     
     if (autonConditionCompleted) {
       autoIncrement++;
@@ -137,9 +136,11 @@ public class Robot extends TimedRobot {
       }
 
       autonConditionCompleted = false;
+      System.out.println("This worked");
+      drive.arcadeDrive(0,0);
     }
-    
     else {
+      System.out.println("I'm cool");
       switch (currentAuton) {
         // DRIVE MODE
         // - Drives forward some distance in **INSERT**UNITS**HERE**
@@ -148,9 +149,10 @@ public class Robot extends TimedRobot {
 
           //double error = ahrs.getAngle();
           //double turn = error;
+          
           double valueToCalculate = (getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters;
           double rawValue = movePid.calculate(valueToCalculate);
-          double driveValue = .4 * MathUtil.clamp(rawValue, -1, 1);
+          double driveValue = MathUtil.clamp(rawValue, -1, 1);
           drive.arcadeDrive(driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
           if (movePid.atSetpoint()) {
             autonConditionCompleted = true;
@@ -220,13 +222,12 @@ public class Robot extends TimedRobot {
   private void setAuton(AutonMode mode, double targetValue) {
 
 
-    /*
+    
     currentAuton = mode;
     autonTarget = targetValue;
 
     switch (mode) {
       case DRIVE:
-        movePid.reset();
         autonStartingPos = getAverageEncoderDistance();
         movePid.setSetpoint(targetValue + (autonStartingPos/Statics.SensorToMeters));
         break;
@@ -240,7 +241,7 @@ public class Robot extends TimedRobot {
         //just if there's nothing else to do
         break;
     }
-    */
+    
 
   }
 

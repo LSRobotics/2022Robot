@@ -41,13 +41,13 @@ public class Robot extends TimedRobot {
 
   private PIDController movePid;
   private PIDController gyroPid;
-  private static final double mP = 1.5; //TODO: move these to statics file
-  private static final double mI = 0;
-  private static final double mD = 0;
+  private static final double mP = Statics.movementPIDp; //TODO: move these to statics file
+  private static final double mI = Statics.movementPIDi;
+  private static final double mD = Statics.movementPidd;
 
-  private static final double gP = 1;
-  private static final double gI = 0;
-  private static final double gD = 0;
+  private static final double gP = Statics.gyroPIDp;
+  private static final double gI = Statics.gyroPIDi;
+  private static final double gD = Statics.gyroPIDd;
 
   private Timer debugTimer;
 
@@ -131,7 +131,7 @@ public class Robot extends TimedRobot {
           setAuton(AutonMode.DRIVE, .5);
           break;
         case 1:
-          setAuton(AutonMode.TURN, .5);
+          setAuton(AutonMode.TURN, 90);
           break;
         default:
           setAuton(AutonMode.NONE, 0);
@@ -156,7 +156,8 @@ public class Robot extends TimedRobot {
           
           double valueToCalculate = (getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters;
           double rawValue = movePid.calculate(valueToCalculate);
-          double driveValue = .4 * MathUtil.clamp(rawValue, -1, 1);
+          System.out.println(rawValue);
+          double driveValue = MathUtil.clamp(rawValue, -1, 1);
           drive.arcadeDrive(driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
           if (movePid.atSetpoint()) {
             autonConditionCompleted = true;
@@ -167,7 +168,7 @@ public class Robot extends TimedRobot {
         case TURN: 
           double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
           drive.arcadeDrive(0,currentRotationRate);
-
+          
           if (gyroPid.atSetpoint()) {
             autonConditionCompleted = true;
           }

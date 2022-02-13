@@ -14,4 +14,13 @@ public class Statics {
     public final static int XboxController_ID = 0;
 
     public final static double SensorToMeters = 45347.75; 
+
+    
+    public final static double movementPIDp = 1;
+    public final static double movementPIDi = 0;
+    public final static double movementPidd = 0;
+
+    public final static double gyroPIDp = 1;
+    public final static double gyroPIDi = 0;
+    public final static double gyroPIDd = 0;
 }

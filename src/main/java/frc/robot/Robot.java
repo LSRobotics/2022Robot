@@ -249,7 +249,6 @@ public class Robot extends TimedRobot {
           
           double valueToCalculate = (getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters;
           double rawValue = movePid.calculate(valueToCalculate);
-          System.out.println(rawValue);
           double driveValue = MathUtil.clamp(rawValue, -1, 1);
           drive.arcadeDrive(driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
           if (movePid.atSetpoint()) {

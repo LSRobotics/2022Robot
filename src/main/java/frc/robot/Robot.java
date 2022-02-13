@@ -79,7 +79,8 @@ public class Robot extends TimedRobot {
   double shooterRPM;
   double navXAngle;
 
-  public XboxController gp;
+  public XboxController gp1;
+  public XboxController gp2;
 
   double shooterSpeed = Statics.Shooter_Speed;
 
@@ -175,14 +176,14 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     
-    driveTrain(gp.getLeftY(), gp.getRightX());
-    setIntakerPosition(gp.getAButtonPressed(), gp.getBButtonPressed());    
+    driveTrain(gp1.getLeftY(), gp1.getRightX());
+    setIntakerPosition(gp1.getAButtonPressed(), gp1.getBButtonPressed());    
 
 
-    if(gp.getXButtonPressed())
+    if(gp2.getXButtonPressed())
       Camera.changeCam();
 
-    if(gp.getYButton()) {
+    if(gp2.getYButton()) {
       shooter.set(shooterSpeed);
       
       if (shooter.getSelectedSensorVelocity() > Statics.Shooter_Target_RPM) //todo
@@ -194,16 +195,16 @@ public class Robot extends TimedRobot {
     }
     
 
-    if (gp.getRightBumperPressed()){
+    if (gp2.getRightBumperPressed()){
       shooterSpeed += 0.05;
     }
     
-    if (gp.getLeftBumperPressed()){
+    if (gp2.getLeftBumperPressed()){
       shooterSpeed -= 0.05;
     }
 
     /* Could be Useful for testing - only for intake
-    if(gp.getBButton()){
+    if(gp1.getBButton()){
       intake.set(Statics.Intake_Speed);
     } else {
       intake.set(0);
@@ -228,7 +229,8 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {}
 
   private void initializeGamePad(){
-    gp = new XboxController(Statics.XboxController_ID);
+    gp1 = new XboxController(Statics.XboxController1_ID);
+    gp2 = new XboxController(Statics.XboxController2_ID);
   }
 
   private void initializeMotorControllers() {

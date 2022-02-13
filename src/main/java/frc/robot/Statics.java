@@ -33,8 +33,9 @@ public class Statics {
     public final static int Intake_Up_Down_Motor_ID = 2;
 
 
-    public final static int XboxController_ID = 0;
-
+    public final static int XboxController1_ID = 0;
+    public final static int XboxController2_ID = 1;
+    
     public static int ultrasonic = 7; //ID has to be figured out
     public static double cm_to_in = 0.049212598;
     public static double inchToSensorUnits = 2148.15278;

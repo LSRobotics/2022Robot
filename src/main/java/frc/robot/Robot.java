@@ -186,7 +186,7 @@ public class Robot extends TimedRobot {
     if(gp2.getYButton()) {
       shooter.set(shooterSpeed);
       
-      if (shooter.getSelectedSensorVelocity() > Statics.Shooter_Target_RPM) //todo
+      if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM) //todo
         index.set(-Statics.Index_Speed);
     } 
     else {

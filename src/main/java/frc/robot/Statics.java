@@ -11,14 +11,15 @@ public class Statics {
     public final static int Front_Right_Motor_ID = 2;
     public final static int Back_Left_Motor_ID = 3;
     public final static int Back_Right_Motor_ID = 4;
-    public final static int ClimbMotorID = 9; 
+    public final static int ClimbMotor1ID = 11;
+    public final static int ClimbMotor2ID = 12; 
 
     public final static double Index_Speed = .5;
     public final static double Intake_Speed = .5;
     public final static double IntakeUppeyDowneySpeed = 0.2;
 
     //Just for now
-    public final static double Shooter_Target_RPM = 1000;
+    public final static double Shooter_Target_RPM = 1;
     public final static double Shooter_Speed = 0.5;
     
 
@@ -27,8 +28,8 @@ public class Statics {
     public final static double deadbandCutoff = 0.1;
 
     public final static int Shooter_Motor_ID = 5;
-    public final static int Index_Motor_ID = 6;
-    public final static int Intake_Motor_ID = 8;
+    public final static int Index_Motor_ID = 0;
+    public final static int Intake_Motor_ID = 1;
 
 
     public final static int XboxController_ID = 0;

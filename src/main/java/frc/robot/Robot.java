@@ -58,7 +58,8 @@ public class Robot extends TimedRobot {
   public WPI_TalonFX fr_drive;
   public WPI_TalonFX bl_drive;
   public WPI_TalonFX br_drive;
-  public WPI_TalonFX climbMechanism;
+  public WPI_TalonFX climbMotor1;
+  public WPI_TalonFX climbMotor2;
 
   public CANSparkMax intake;
   public CANSparkMax shooter;
@@ -181,7 +182,7 @@ public class Robot extends TimedRobot {
     if(gp.getYButton()) {
       shooter.set(shooterSpeed);
       
-      if (shooter.getEncoder().getVelocity() == Statics.Shooter_Target_RPM)
+      if (shooter.getEncoder().getVelocity() > Statics.Shooter_Target_RPM) //todo
         index.set(Statics.Index_Speed);
     } 
     else {
@@ -233,7 +234,8 @@ public class Robot extends TimedRobot {
     fr_drive = new WPI_TalonFX(Statics.Front_Right_Motor_ID);
     bl_drive = new WPI_TalonFX(Statics.Back_Left_Motor_ID);
     br_drive = new WPI_TalonFX(Statics.Back_Right_Motor_ID);
-    climbMechanism = new WPI_TalonFX(Statics.ClimbMotorID);
+    climbMotor1 = new WPI_TalonFX(Statics.ClimbMotor1ID);
+    climbMotor2 = new WPI_TalonFX(Statics.ClimbMotor2ID);
 
     shooter = new CANSparkMax(Statics.Shooter_Motor_ID, MotorType.kBrushless);
     intake = new CANSparkMax(Statics.Intake_Motor_ID, MotorType.kBrushed);
@@ -335,7 +337,7 @@ public class Robot extends TimedRobot {
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)
     .withPosition(2, 0)
-    .getEntry(); 
+    .getEntry();
     
     ultrasonicDistance = testTab.add("Distance to target", 0)
     .withWidget(BuiltInWidgets.kDial)

@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -54,17 +56,18 @@ public class Robot extends TimedRobot {
   MotorControllerGroup right_motors;
   DifferentialDrive drive;
   
-  public WPI_TalonFX fl_drive;
-  public WPI_TalonFX fr_drive;
-  public WPI_TalonFX bl_drive;
-  public WPI_TalonFX br_drive;
+  public CANSparkMax fl_drive;
+  public CANSparkMax fr_drive;
+  public CANSparkMax bl_drive;
+  public CANSparkMax br_drive;
+
   public WPI_TalonFX climbMotor1;
   public WPI_TalonFX climbMotor2;
+  public WPI_TalonFX shooter;
 
-  public CANSparkMax intake;
-  public CANSparkMax shooter;
-  public CANSparkMax index;
-  public CANSparkMax intakeUpDown;
+  public Spark intake;
+  public Spark index;
+  public Spark intakeUpDown;
 
   double pdpNum;
   double distance;
@@ -124,7 +127,7 @@ public class Robot extends TimedRobot {
     right_motors = new MotorControllerGroup(fr_drive, br_drive);
     drive = new DifferentialDrive(left_motors, right_motors);
 
-    pdp = new PowerDistribution();
+    //pdp = new PowerDistribution();
     
     ultrasonic = new AnalogInput(Statics.ultrasonic);
 
@@ -182,8 +185,8 @@ public class Robot extends TimedRobot {
     if(gp.getYButton()) {
       shooter.set(shooterSpeed);
       
-      if (shooter.getEncoder().getVelocity() > Statics.Shooter_Target_RPM) //todo
-        index.set(Statics.Index_Speed);
+      if (shooter.getSelectedSensorVelocity() > Statics.Shooter_Target_RPM) //todo
+        index.set(-Statics.Index_Speed);
     } 
     else {
       shooter.set(0);
@@ -230,16 +233,19 @@ public class Robot extends TimedRobot {
 
   private void initializeMotorControllers() {
 
-    fl_drive = new WPI_TalonFX(Statics.Front_Left_Motor_ID);
-    fr_drive = new WPI_TalonFX(Statics.Front_Right_Motor_ID);
-    bl_drive = new WPI_TalonFX(Statics.Back_Left_Motor_ID);
-    br_drive = new WPI_TalonFX(Statics.Back_Right_Motor_ID);
+    
     climbMotor1 = new WPI_TalonFX(Statics.ClimbMotor1ID);
     climbMotor2 = new WPI_TalonFX(Statics.ClimbMotor2ID);
+    shooter = new WPI_TalonFX(Statics.Shooter_Motor_ID);
 
-    shooter = new CANSparkMax(Statics.Shooter_Motor_ID, MotorType.kBrushless);
-    intake = new CANSparkMax(Statics.Intake_Motor_ID, MotorType.kBrushed);
-    index = new CANSparkMax(Statics.Index_Motor_ID, MotorType.kBrushed);
+    intake = new Spark(Statics.Intake_Motor_ID);
+    index = new Spark(Statics.Index_Motor_ID);
+    intakeUpDown = new Spark(Statics.Intake_Up_Down_Motor_ID);
+    fl_drive = new CANSparkMax(Statics.Front_Left_Motor_ID, MotorType.kBrushless);
+    fr_drive = new CANSparkMax(Statics.Front_Right_Motor_ID, MotorType.kBrushless);
+    bl_drive = new CANSparkMax(Statics.Back_Left_Motor_ID, MotorType.kBrushless);
+    br_drive = new CANSparkMax(Statics.Back_Right_Motor_ID, MotorType.kBrushless);
+    
   }
 
 
@@ -285,7 +291,7 @@ public class Robot extends TimedRobot {
   }
   public void updateInputs(){
     
-    pdpNum = pdp.getVoltage();
+    //pdpNum = pdp.getVoltage();
     distance = getRangeInches(ultrasonic.getValue());
     leftMotorN = fl_drive.get();
     rightMotorN = fr_drive.get();
@@ -294,7 +300,7 @@ public class Robot extends TimedRobot {
     indexN = index.get();
     intakeN = intake.get();
 
-    shooterRPM = shooter.getEncoder().getVelocity();
+    shooterRPM = shooter.getSelectedSensorVelocity();
     
     //navXAngle = navX.getAngle();
     

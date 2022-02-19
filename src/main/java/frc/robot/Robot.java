@@ -25,6 +25,12 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import java.util.*;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI; //TODO: change the port system depending on what we actually use
+
 
 
 //import frc.robot.Constants.Statics;
@@ -110,6 +116,39 @@ public class Robot extends TimedRobot {
   SimpleWidget navXEntry;
   ComplexWidget cameraTest;
 
+  //AutonInit
+  private PIDController movePid;
+  private PIDController gyroPid;
+  private static final double mP = Statics.movementPIDp; //TODO: move these to statics file
+  private static final double mI = Statics.movementPIDi;
+  private static final double mD = Statics.movementPidd;
+
+  private static final double gP = Statics.gyroPIDp;
+  private static final double gI = Statics.gyroPIDi;
+  private static final double gD = Statics.gyroPIDd;
+
+  private int autoIncrement;
+
+  private AHRS ahrs;
+
+  private enum AutonMode {
+    DRIVE, 
+    TURN,
+    NONE
+  }
+
+  private AutonMode currentAuton;
+
+  private boolean autonConditionCompleted;
+
+  private double autonTarget;
+
+  private double autonStartingPos;
+
+  /*private Object[][] AutonInstructions = {
+    {AutonMode.DRIVE, 10}
+  };      // this could be cool but is not practical right now*/
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -134,6 +173,11 @@ public class Robot extends TimedRobot {
 
     shuffleboardStartup();
 
+    
+    movePid = new PIDController(mP,mI,mD); //TODO: figure out the kP, kI, and kD values required for actual instantiation
+    gyroPid = new PIDController(gP,gI,gD); //TODO: figure out the kP, kI, and kD values required for actual instantiation
+
+    ahrs = new AHRS(SPI.Port.kMXP);
   }
 
   /**
@@ -161,11 +205,78 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    autoIncrement = -1;
+    autonConditionCompleted = true;
+    currentAuton = AutonMode.NONE;
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+    //When each step of autonomous is completed
+    
+    if (autonConditionCompleted) {
+      autoIncrement++;
+
+    
+      // AUTO INCREMENT [PLACE AUTON INSTRUCTIONS HERE]
+      // - each switch case is another instruction
+      // - currently it is a switch statement and not an array to allow for some alternative functions to be called other than `set auton`
+      // - SetAuton(AutonMode, targetValue) is the main function being used currently.
+      // - Current AutonModes are `DRIVE` and `TURN`, with `NONE` being just to do nothing
+      // - the targetValue is the value whatever the specific AutonMode is measuring should reach
+      
+      switch (autoIncrement) {
+        case 0:
+          setAuton(AutonMode.DRIVE, .5);
+          break;
+        case 1:
+          setAuton(AutonMode.TURN, 90);
+          break;
+        default:
+          setAuton(AutonMode.NONE, 0);
+          break;
+      }
+
+      autonConditionCompleted = false;
+      System.out.println("Started Next Auton Instruction");
+      drive.arcadeDrive(0,0);
+    }
+    else {
+      switch (currentAuton) {
+        // DRIVE MODE
+        // - Drives forward some distance in **INSERT**UNITS**HERE**
+        // - Uses the ahrs in order to ensure the robot drives straight
+        case DRIVE: 
+
+          //double error = ahrs.getAngle();
+          //double turn = error;
+          
+          double valueToCalculate = (getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters;
+          double rawValue = movePid.calculate(valueToCalculate);
+          double driveValue = MathUtil.clamp(rawValue, -1, 1);
+          drive.arcadeDrive(driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
+          if (movePid.atSetpoint()) {
+            autonConditionCompleted = true;
+          }
+          break;
+        // TURN MODE 
+        // - Turns some distance in degrees
+        case TURN: 
+          double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
+          drive.arcadeDrive(0,currentRotationRate);
+          
+          if (gyroPid.atSetpoint()) {
+            autonConditionCompleted = true;
+          }
+          break;
+        case NONE:
+        default:
+          drive.arcadeDrive(0,0);
+          break;
+      }
+    }
+    
   }
 
   /** This function is called once when teleop is enabled. */
@@ -449,5 +560,39 @@ public class Robot extends TimedRobot {
     */
   }
   
+
+  
+  private void setAuton(AutonMode mode, double targetValue) {
+
+
+    
+    currentAuton = mode;
+    autonTarget = targetValue;
+
+    switch (mode) {
+      case DRIVE:
+        autonStartingPos = getAverageEncoderDistance();
+        movePid.setSetpoint(targetValue + (autonStartingPos/Statics.SensorToMeters));
+        break;
+      case TURN:
+        ahrs.reset();
+        gyroPid.setSetpoint(targetValue);
+        break;
+      case NONE:
+      default:
+        //just if there's nothing else to do
+        break;
+    }
+    
+
+  }
+
+  /* gAED:
+    - Gets the average encoder distance in each of the main drive motors
+    - Returns a value in sensor units and must be converted (could change later)
+  */
+  private double getAverageEncoderDistance() {
+    return (fl_drive.getSelectedSensorPosition() + fr_drive.getSelectedSensorPosition() + bl_drive.getSelectedSensorPosition() + br_drive.getSelectedSensorPosition())/4;
+  }
   
 }

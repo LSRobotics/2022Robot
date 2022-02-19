@@ -178,6 +178,8 @@ public class Robot extends TimedRobot {
     gyroPid = new PIDController(gP,gI,gD); //TODO: figure out the kP, kI, and kD values required for actual instantiation
 
     ahrs = new AHRS(SPI.Port.kMXP);
+
+
   }
 
   /**
@@ -287,7 +289,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     
-    driveTrain(gp1.getLeftY(), gp1.getRightX());
+    driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
     setIntakerPosition(gp1.getAButtonPressed(), gp1.getBButtonPressed());    
 
 
@@ -296,7 +298,7 @@ public class Robot extends TimedRobot {
 
     if(gp2.getYButton()) {
       shooter.set(shooterSpeed);
-      
+
       if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM) //todo
         index.set(-Statics.Index_Speed);
     } 
@@ -314,13 +316,11 @@ public class Robot extends TimedRobot {
       shooterSpeed -= 0.05;
     }
 
-    /* Could be Useful for testing - only for intake
-    if(gp1.getBButton()){
+    if(gp2.getBButton()){
       intake.set(Statics.Intake_Speed);
     } else {
       intake.set(0);
     }
-    */
   }
 
   /** This function is called once when the robot is disabled. */
@@ -369,7 +369,8 @@ public class Robot extends TimedRobot {
   }
 
   private double cubic(double x, double w){
-    return w * x * x * x  + (1.0 - w) * x;
+    //return w * x * x * x  + (1.0 - w) * x;
+    return w * x * x * x;
   }
 
 
@@ -381,7 +382,8 @@ public class Robot extends TimedRobot {
     if (Math.abs(x) < deadbandCutoff) {
       return 0;
     } else {
-      return (cubic(x, weight)- (Math.abs(x)/x)* cubic(deadbandCutoff, weight)) / (1.0 - cubic(deadbandCutoff, weight));
+      //return (cubic(x, weight)- (Math.abs(x)/x) * cubic(deadbandCutoff, weight)) / (1.0 - cubic(deadbandCutoff, weight));
+      return cubic(x,weight);
     }
   }
 
@@ -413,7 +415,7 @@ public class Robot extends TimedRobot {
     indexN = index.get();
     intakeN = intake.get();
 
-    shooterRPM = shooter.getSelectedSensorVelocity();
+    shooterRPM = 0;//shooter.getSelectedSensorVelocity();
     
     //navXAngle = navX.getAngle();
     
@@ -592,7 +594,7 @@ public class Robot extends TimedRobot {
     - Returns a value in sensor units and must be converted (could change later)
   */
   private double getAverageEncoderDistance() {
-    return (fl_drive.getSelectedSensorPosition() + fr_drive.getSelectedSensorPosition() + bl_drive.getSelectedSensorPosition() + br_drive.getSelectedSensorPosition())/4;
+    return (fl_drive.getEncoder().getPosition() + fr_drive.getEncoder().getPosition() + bl_drive.getEncoder().getPosition() + br_drive.getEncoder().getPosition())/4;
   }
   
 }

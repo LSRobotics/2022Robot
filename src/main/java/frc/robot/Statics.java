@@ -19,7 +19,7 @@ public class Statics {
     public final static double IntakeUppeyDowneySpeed = 0.2;
 
     //Just for now
-    public final static double Shooter_Target_RPM = 1;
+    public final static double Shooter_Target_RPM = 10000;
     public final static double Shooter_Speed = 0.5;
     
 
@@ -29,8 +29,8 @@ public class Statics {
 
     public final static int Shooter_Motor_ID = 5;
     public final static int Index_Motor_ID = 0;
-    public final static int Intake_Motor_ID = 1;
-    public final static int Intake_Up_Down_Motor_ID = 2;
+    public final static int Intake_Motor_ID = 2; 
+    public final static int Intake_Up_Down_Motor_ID = 1;
 
 
     public final static int XboxController1_ID = 0;

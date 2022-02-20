@@ -119,13 +119,6 @@ public class Robot extends TimedRobot {
   //AutonInit
   private PIDController movePid;
   private PIDController gyroPid;
-  private static final double mP = Statics.movementPIDp; //TODO: move these to statics file
-  private static final double mI = Statics.movementPIDi;
-  private static final double mD = Statics.movementPidd;
-
-  private static final double gP = Statics.gyroPIDp;
-  private static final double gI = Statics.gyroPIDi;
-  private static final double gD = Statics.gyroPIDd;
 
   private int autoIncrement;
 
@@ -174,8 +167,8 @@ public class Robot extends TimedRobot {
     shuffleboardStartup();
 
     
-    movePid = new PIDController(mP,mI,mD); //TODO: figure out the kP, kI, and kD values required for actual instantiation
-    gyroPid = new PIDController(gP,gI,gD); //TODO: figure out the kP, kI, and kD values required for actual instantiation
+    movePid = new PIDController(Statics.movementPIDp, Statics.movementPIDi, Statics.movementPidd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
+    gyroPid = new PIDController(Statics.gyroPIDp, Statics.gyroPIDi, Statics.gyroPIDd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
 
     ahrs = new AHRS(SPI.Port.kMXP);
 
@@ -290,37 +283,11 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    setIntakerPosition(gp1.getAButtonPressed(), gp1.getBButtonPressed());    
+    controlIntake(gp1.getAButton(), gp1.getBButtonPressed(), gp1.getXButton(), gp1.getYButton());    
+    controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
 
-
-    if(gp2.getXButtonPressed())
+    if(gp2.getStartButtonPressed())
       Camera.changeCam();
-
-    if(gp2.getYButton()) {
-      shooter.set(shooterSpeed);
-
-      if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM) //todo
-        index.set(-Statics.Index_Speed);
-    } 
-    else {
-      shooter.set(0);
-      index.set(0);
-    }
-    
-
-    if (gp2.getRightBumperPressed()){
-      shooterSpeed += 0.05;
-    }
-    
-    if (gp2.getLeftBumperPressed()){
-      shooterSpeed -= 0.05;
-    }
-
-    if(gp2.getBButton()){
-      intake.set(Statics.Intake_Speed);
-    } else {
-      intake.set(0);
-    }
   }
 
   /** This function is called once when the robot is disabled. */
@@ -344,9 +311,7 @@ public class Robot extends TimedRobot {
     gp2 = new XboxController(Statics.XboxController2_ID);
   }
 
-  private void initializeMotorControllers() {
-
-    
+  private void initializeMotorControllers() {`    
     climbMotor1 = new WPI_TalonFX(Statics.ClimbMotor1ID);
     climbMotor2 = new WPI_TalonFX(Statics.ClimbMotor2ID);
     shooter = new WPI_TalonFX(Statics.Shooter_Motor_ID);
@@ -361,18 +326,14 @@ public class Robot extends TimedRobot {
     
   }
 
-
   private void driveTrain(double power, double turn) {
     drive.arcadeDrive(cubicScaledDeadband(power, Statics.deadbandCutoff, Statics.Weight),
                       cubicScaledDeadband(turn, Statics.deadbandCutoff, Statics.Weight));
-
   }
 
   private double cubic(double x, double w){
-    //return w * x * x * x  + (1.0 - w) * x;
-    return w * x * x * x;
+    return w * x * x * x  + (1.0 - w) * x;
   }
-
 
   public double getRangeInches(double rawVoltage){
     return rawVoltage * Statics.cm_to_in;
@@ -382,13 +343,11 @@ public class Robot extends TimedRobot {
     if (Math.abs(x) < deadbandCutoff) {
       return 0;
     } else {
-      //return (cubic(x, weight)- (Math.abs(x)/x) * cubic(deadbandCutoff, weight)) / (1.0 - cubic(deadbandCutoff, weight));
-      return cubic(x,weight);
+      return (cubic(x, weight)- (Math.abs(x)/x) * cubic(deadbandCutoff, weight)) / (1.0 - cubic(deadbandCutoff, weight));
     }
   }
 
   public void updateNetworkEntries(){
-    
     pdpVoltage.setDouble(pdpNum);
     ultrasonicDistance.setDouble(distance);
     rightMotorNetworkTable.setDouble(rightMotorN);
@@ -400,12 +359,9 @@ public class Robot extends TimedRobot {
 
     shooterRPMEntry.setDouble(shooterRPM);
     
-    
     //navXEntry.setDouble(navXAngle)
-    
   }
   public void updateInputs(){
-    
     //pdpNum = pdp.getVoltage();
     distance = getRangeInches(ultrasonic.getValue());
     leftMotorN = fl_drive.get();
@@ -418,35 +374,57 @@ public class Robot extends TimedRobot {
     shooterRPM = 0;//shooter.getSelectedSensorVelocity();
     
     //navXAngle = navX.getAngle();
-    
   }
 
   //If button is pressed move until limit switch
-  public void setIntakerPosition(boolean left, boolean right){
-
+  public void controlIntake(boolean lowerAndShoot, boolean liftIntake, boolean reverseIntake, boolean testIntake){
       //Controls actual intake - only on if at bottom
-      if (bottomLimitSwitch.get() && left) {
+      if (bottomLimitSwitch.get() && lowerAndShoot) {
         intake.set(Statics.Intake_Speed);
-      }
-      else {
+      } else if (testIntake){
+        intake.set(Statics.Intake_Speed);
+      } else if (reverseIntake){
+        intake.set(-Statics.Intake_Speed);
+      } else {
         intake.set(0);
       }
 
       //defaults movement to go up - if B button - go up until limit switch
-      if (!topLimitSwitch.get() && right) 
+      if (!topLimitSwitch.get() && liftIntake) 
         goingUp = true;
       else if (topLimitSwitch.get())
         goingUp = false;
 
-        //If we're not going up, figure out if we want to go down until bottom limit switch
+      //If we're not going up, figure out if we want to go down until bottom limit switch
       if (goingUp)
         intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-        else if (!bottomLimitSwitch.get() && left)
+        else if (!bottomLimitSwitch.get() && lowerAndShoot)
         intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
         else 
          intakeUpDown.set(0);
   }
   
+  public void controlShooter(boolean shoot, boolean raiseSpeed, boolean lowerSpeed){
+    if(gp2.getYButton()) {
+      shooter.set(shooterSpeed);
+      if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM) {
+        index.set(-Statics.Index_Speed); //todo
+      } else {
+          index.set(0);
+      }
+    } else {
+      shooter.set(0);
+      index.set(0);
+    }
+    
+    if (gp2.getRightBumperPressed()){
+      shooterSpeed += 0.05;
+    }
+    if (gp2.getLeftBumperPressed()){
+      shooterSpeed -= 0.05;
+    }    
+  }
+
   public void shuffleboardStartup(){
     rightMotorNetworkTable = testTab.add("Right Motor Value", 1)
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
@@ -481,7 +459,6 @@ public class Robot extends TimedRobot {
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize(1,1)
     .withPosition(4,2);
-
 
     //Start of competition tab stuff
     rightMotorNetworkTable = compTab.add("Right Motor Value", 1)
@@ -562,12 +539,7 @@ public class Robot extends TimedRobot {
     */
   }
   
-
-  
   private void setAuton(AutonMode mode, double targetValue) {
-
-
-    
     currentAuton = mode;
     autonTarget = targetValue;
 
@@ -585,8 +557,6 @@ public class Robot extends TimedRobot {
         //just if there's nothing else to do
         break;
     }
-    
-
   }
 
   /* gAED:

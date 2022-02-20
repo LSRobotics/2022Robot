@@ -13,6 +13,8 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.Servo;
+
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
@@ -67,8 +69,11 @@ public class Robot extends TimedRobot {
   public CANSparkMax bl_drive;
   public CANSparkMax br_drive;
 
-  public WPI_TalonFX climbMotor1;
-  public WPI_TalonFX climbMotor2;
+  public Servo climbRatchet;
+
+  public WPI_TalonFX verticalClimb;
+  public WPI_TalonFX horizontalClimb;
+
   public WPI_TalonFX shooter;
 
   public Spark intake;
@@ -101,8 +106,6 @@ public class Robot extends TimedRobot {
   DigitalInput bottomLimitSwitch = new DigitalInput(0);
   DigitalInput topLimitSwitch = new DigitalInput(1);
   
-
-  //public VictorSPX motor1;
   ShuffleboardTab testTab = Shuffleboard.getTab("Test Board");
   ShuffleboardTab compTab = Shuffleboard.getTab("Competition Board");
   NetworkTableEntry rightMotorNetworkTable;
@@ -159,6 +162,7 @@ public class Robot extends TimedRobot {
     left_motors = new MotorControllerGroup(fl_drive, bl_drive);
     right_motors = new MotorControllerGroup(fr_drive, br_drive);
     drive = new DifferentialDrive(left_motors, right_motors);
+
 
     //pdp = new PowerDistribution();
     
@@ -286,6 +290,8 @@ public class Robot extends TimedRobot {
     controlIntake(gp1.getAButton(), gp1.getBButtonPressed(), gp1.getXButton(), gp1.getYButton());    
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
 
+    climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV());
+
     if(gp2.getStartButtonPressed())
       Camera.changeCam();
   }
@@ -311,18 +317,21 @@ public class Robot extends TimedRobot {
     gp2 = new XboxController(Statics.XboxController2_ID);
   }
 
-  private void initializeMotorControllers() {`    
-    climbMotor1 = new WPI_TalonFX(Statics.ClimbMotor1ID);
-    climbMotor2 = new WPI_TalonFX(Statics.ClimbMotor2ID);
+  private void initializeMotorControllers() {   
+   
     shooter = new WPI_TalonFX(Statics.Shooter_Motor_ID);
-
     intake = new Spark(Statics.Intake_Motor_ID);
     index = new Spark(Statics.Index_Motor_ID);
     intakeUpDown = new Spark(Statics.Intake_Up_Down_Motor_ID);
+    
     fl_drive = new CANSparkMax(Statics.Front_Left_Motor_ID, MotorType.kBrushless);
     fr_drive = new CANSparkMax(Statics.Front_Right_Motor_ID, MotorType.kBrushless);
     bl_drive = new CANSparkMax(Statics.Back_Left_Motor_ID, MotorType.kBrushless);
     br_drive = new CANSparkMax(Statics.Back_Right_Motor_ID, MotorType.kBrushless);
+
+    verticalClimb = new WPI_TalonFX(Statics.Vertical_Climb_Motor_ID);
+    horizontalClimb = new WPI_TalonFX(Statics.Horizontal_Climb_Motor_ID);
+    climbRatchet = new Servo(Statics.Climb_Ratchet_ID);
     
   }
 
@@ -347,6 +356,24 @@ public class Robot extends TimedRobot {
     }
   }
 
+  public void climb(boolean up, boolean down, int horizontalDirection){
+    if (up){
+      verticalClimb.set(Statics.Vertical_Climb_Speed);
+    } else if (down) {
+      verticalClimb.set(-Statics.Vertical_Climb_Speed);
+    } else {
+      verticalClimb.set(0);
+    }
+
+    if (horizontalDirection == 90){
+      horizontalClimb.set(Statics.Horizontal_Climb_Speed);
+    } else if (horizontalDirection == 270){
+      horizontalClimb.set(-Statics.Horizontal_Climb_Speed);
+    } else {
+      horizontalClimb.set(0);
+    }
+
+  }
   public void updateNetworkEntries(){
     pdpVoltage.setDouble(pdpNum);
     ultrasonicDistance.setDouble(distance);

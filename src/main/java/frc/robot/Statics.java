@@ -21,7 +21,7 @@ public class Statics {
 
     public final static double Index_Speed = .5;
     public final static double Intake_Speed = 1;
-    public final static double IntakeUppeyDowneySpeed = 0.2;
+    public final static double IntakeUppeyDowneySpeed = 0.9;
 
     //Just for now
     public final static double Shooter_Target_RPM = 0;

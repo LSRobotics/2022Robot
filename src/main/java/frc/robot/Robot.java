@@ -294,6 +294,7 @@ public class Robot extends TimedRobot {
 
     if(gp2.getStartButtonPressed())
       Camera.changeCam();
+      //hehe
   }
 
   /** This function is called once when the robot is disabled. */

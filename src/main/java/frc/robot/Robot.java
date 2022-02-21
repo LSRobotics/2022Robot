@@ -422,17 +422,15 @@ public class Robot extends TimedRobot {
 
       //defaults movement to go up - if B button - go up until limit switch
       if (topLimitSwitch.get() && liftIntake) 
-        goingUp = true;
-      else if (topLimitSwitch.get())
-        goingUp = false;
-
-      //If we're not going up, figure out if we want to go down until bottom limit switch
-      if (goingUp)
         intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-        else if (bottomLimitSwitch.get() && lowerAndShoot)
+      else if (bottomLimitSwitch.get() && lowerAndShoot)
         intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
-        else 
+      else 
          intakeUpDown.set(0);
+      //If we're not going up, figure out if we want to go down until bottom limit switch
+        
+        
+        
   }
   
   public void controlShooter(boolean shoot, boolean raiseSpeed, boolean lowerSpeed){

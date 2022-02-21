@@ -30,7 +30,7 @@ import java.util.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
-import com.kauailabs.navx.frc.AHRS;
+//import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI; //TODO: change the port system depending on what we actually use
 
 
@@ -103,8 +103,8 @@ public class Robot extends TimedRobot {
   public PowerDistribution pdp;
 
   AnalogInput ultrasonic;  
-  DigitalInput bottomLimitSwitch = new DigitalInput(0);
-  DigitalInput topLimitSwitch = new DigitalInput(1);
+  DigitalInput bottomLimitSwitch = new DigitalInput(1);
+  DigitalInput topLimitSwitch = new DigitalInput(0);
   
   ShuffleboardTab testTab = Shuffleboard.getTab("Test Board");
   ShuffleboardTab compTab = Shuffleboard.getTab("Competition Board");
@@ -125,7 +125,7 @@ public class Robot extends TimedRobot {
 
   private int autoIncrement;
 
-  private AHRS ahrs;
+  //private AHRS ahrs;
 
   private enum AutonMode {
     DRIVE, 
@@ -174,7 +174,7 @@ public class Robot extends TimedRobot {
     movePid = new PIDController(Statics.movementPIDp, Statics.movementPIDi, Statics.movementPidd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
     gyroPid = new PIDController(Statics.gyroPIDp, Statics.gyroPIDi, Statics.gyroPIDd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
 
-    ahrs = new AHRS(SPI.Port.kMXP);
+    //ahrs = new AHRS(SPI.Port.kMXP);
 
 
   }
@@ -262,8 +262,8 @@ public class Robot extends TimedRobot {
         // TURN MODE 
         // - Turns some distance in degrees
         case TURN: 
-          double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
-          drive.arcadeDrive(0,currentRotationRate);
+          //double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
+          //drive.arcadeDrive(0,currentRotationRate);
           
           if (gyroPid.atSetpoint()) {
             autonConditionCompleted = true;
@@ -287,7 +287,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    controlIntake(gp1.getAButton(), gp1.getBButtonPressed(), gp1.getXButton(), gp1.getYButton());    
+    controlIntake(gp2.getAButton(), gp2.getBButtonPressed(), gp1.getXButton(), gp1.getYButton());    
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
 
     climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV());
@@ -576,7 +576,7 @@ public class Robot extends TimedRobot {
         movePid.setSetpoint(targetValue + (autonStartingPos/Statics.SensorToMeters));
         break;
       case TURN:
-        ahrs.reset();
+        //ahrs.reset();
         gyroPid.setSetpoint(targetValue);
         break;
       case NONE:

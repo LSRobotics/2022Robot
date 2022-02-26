@@ -398,7 +398,7 @@ public class Robot extends TimedRobot {
     //navXEntry.setDouble(navXAngle)
   }
   public void updateInputs(){
-    //pdpNum = pdp.getVoltage();
+    pdpNum = pdp.getVoltage();
     distance = getRangeInches(ultrasonic.getValue());
     leftMotorN = fl_drive.get();
     rightMotorN = fr_drive.get();
@@ -407,7 +407,8 @@ public class Robot extends TimedRobot {
     indexN = index.get();
     intakeN = intake.get();
 
-    shooterRPM = 0;//shooter.getSelectedSensorVelocity();
+    //shooterRPM = 0;
+    shooter.getSelectedSensorVelocity();
     
     //navXAngle = navX.getAngle();
   }

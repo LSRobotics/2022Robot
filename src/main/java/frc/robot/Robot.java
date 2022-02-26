@@ -98,13 +98,14 @@ public class Robot extends TimedRobot {
   double speed;
 
   boolean goingUp = false;
-
+  double servoAngle = 0;
 
   public PowerDistribution pdp;
 
   AnalogInput ultrasonic;  
   DigitalInput bottomLimitSwitch = new DigitalInput(1);
   DigitalInput topLimitSwitch = new DigitalInput(0);
+  Servo angleAdjuster = new Servo(2); //channel??
   
   ShuffleboardTab testTab = Shuffleboard.getTab("Test Board");
   ShuffleboardTab compTab = Shuffleboard.getTab("Competition Board");
@@ -164,7 +165,7 @@ public class Robot extends TimedRobot {
     drive = new DifferentialDrive(left_motors, right_motors);
 
 
-    //pdp = new PowerDistribution();
+    pdp = new PowerDistribution();
     
     ultrasonic = new AnalogInput(Statics.ultrasonic);
 
@@ -287,10 +288,12 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    controlIntake(gp2.getAButton(), gp2.getBButtonPressed(), gp1.getXButton(), gp1.getYButton());    
+    controlIntake(gp2.getAButton(), gp2.getBButton(), gp1.getXButton(), gp1.getYButton());    
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
 
     climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV());
+    if(gp2.getLeftStickButtonPressed())
+      shooterSetAngle(servoAngle);
 
     if(gp2.getStartButtonPressed())
       Camera.changeCam();
@@ -452,6 +455,15 @@ public class Robot extends TimedRobot {
     if (gp2.getLeftBumperPressed()){
       shooterSpeed -= 0.05;
     }    
+  }
+  //needs some work - start case at angle 0
+  public void shooterSetAngle(double previousAngle){
+    
+    if (previousAngle == 15){
+      angleAdjuster.setAngle(30);
+    }
+    else if (previousAngle == 30)
+      angleAdjuster.setAngle(15);
   }
 
   public void shuffleboardStartup(){

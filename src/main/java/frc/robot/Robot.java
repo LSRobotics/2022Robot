@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
@@ -105,7 +106,7 @@ public class Robot extends TimedRobot {
   AnalogInput ultrasonic;  
   DigitalInput bottomLimitSwitch = new DigitalInput(1);
   DigitalInput topLimitSwitch = new DigitalInput(0);
-  Servo angleAdjuster = new Servo(2); //channel??
+  //Servo angleAdjuster = new Servo(2); //channel??
   
   ShuffleboardTab testTab = Shuffleboard.getTab("Test Board");
   ShuffleboardTab compTab = Shuffleboard.getTab("Competition Board");
@@ -164,8 +165,12 @@ public class Robot extends TimedRobot {
     right_motors = new MotorControllerGroup(fr_drive, br_drive);
     drive = new DifferentialDrive(left_motors, right_motors);
 
-
-    pdp = new PowerDistribution();
+    fl_drive.setOpenLoopRampRate(0.5);
+    fr_drive.setOpenLoopRampRate(0.5);
+    bl_drive.setOpenLoopRampRate(0.5);
+    br_drive.setOpenLoopRampRate(0.5);
+    
+    pdp = new PowerDistribution(0, ModuleType.kCTRE);
     
     ultrasonic = new AnalogInput(Statics.ultrasonic);
 
@@ -440,7 +445,7 @@ public class Robot extends TimedRobot {
     if(gp2.getYButton()) {
       shooter.set(shooterSpeed);
       if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM) {
-        index.set(-Statics.Index_Speed); //todo
+        index.set(Statics.Index_Speed); //todo
       } else {
           index.set(0);
       }
@@ -449,16 +454,16 @@ public class Robot extends TimedRobot {
       index.set(0);
     }
     
-    if (gp2.getRightBumperPressed()){
+    if (raiseSpeed){
       shooterSpeed += 0.05;
     }
-    if (gp2.getLeftBumperPressed()){
+    if (lowerSpeed){
       shooterSpeed -= 0.05;
     }    
   }
   //needs some work - start case at angle 0
   public void shooterSetAngle(double previousAngle){
-    
+    /*
     if (previousAngle == 0)
       angleAdjuster.setAngle(15);
     else if (previousAngle == 15){
@@ -466,7 +471,8 @@ public class Robot extends TimedRobot {
     }
     else if (previousAngle == 30)
       angleAdjuster.setAngle(15);
-  }
+ */
+    }
 
   public void shuffleboardStartup(){
     rightMotorNetworkTable = testTab.add("Right Motor Value", 1)

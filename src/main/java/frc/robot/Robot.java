@@ -459,7 +459,9 @@ public class Robot extends TimedRobot {
   //needs some work - start case at angle 0
   public void shooterSetAngle(double previousAngle){
     
-    if (previousAngle == 15){
+    if (previousAngle == 0)
+      angleAdjuster.setAngle(15);
+    else if (previousAngle == 15){
       angleAdjuster.setAngle(30);
     }
     else if (previousAngle == 30)

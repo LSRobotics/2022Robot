@@ -6,7 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+//import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
@@ -32,7 +32,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
 //import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SPI; //TODO: change the port system depending on what we actually use
+//import edu.wpi.first.wpilibj.SPI; //TODO: change the port system depending on what we actually use
 
 
 
@@ -106,7 +106,7 @@ public class Robot extends TimedRobot {
   AnalogInput ultrasonic;  
   DigitalInput bottomLimitSwitchIntake = new DigitalInput(1);
   DigitalInput topLimitSwitchIntake = new DigitalInput(0);
-  Servo angleAdjuster = new Servo(3); //channel??
+  Servo angleAdjuster = new Servo(4); //channel??
   
   ShuffleboardTab testTab = Shuffleboard.getTab("Test Board");
   ShuffleboardTab compTab = Shuffleboard.getTab("Competition Board");
@@ -463,17 +463,20 @@ public class Robot extends TimedRobot {
       shooterSpeed -= 0.05;
     }    
   }
-  //needs some work - start case at angle 0
+  //needs specific angles
   public void shooterSetAngle(double previousAngle){
     
-    if (previousAngle == 0)
-      angleAdjuster.setAngle(15);
-    else if (previousAngle == 15){
-      angleAdjuster.setAngle(30);
+    if (previousAngle == 0) {
+      angleAdjuster.setAngle(45);
+      servoAngle = 45;
+    } else if (previousAngle == 45){
+      angleAdjuster.setAngle(90);
+      servoAngle = 90;
     }
-    else if (previousAngle == 30)
-      angleAdjuster.setAngle(15);
- 
+    else if (previousAngle == 90){
+      angleAdjuster.setAngle(0);
+      servoAngle = 0;
+      }
     }
 
   public void shuffleboardStartup(){

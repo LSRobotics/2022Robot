@@ -104,9 +104,9 @@ public class Robot extends TimedRobot {
   public PowerDistribution pdp;
 
   AnalogInput ultrasonic;  
-  DigitalInput bottomLimitSwitch = new DigitalInput(1);
-  DigitalInput topLimitSwitch = new DigitalInput(0);
-  //Servo angleAdjuster = new Servo(2); //channel??
+  DigitalInput bottomLimitSwitchIntake = new DigitalInput(1);
+  DigitalInput topLimitSwitchIntake = new DigitalInput(0);
+  Servo angleAdjuster = new Servo(3); //channel??
   
   ShuffleboardTab testTab = Shuffleboard.getTab("Test Board");
   ShuffleboardTab compTab = Shuffleboard.getTab("Competition Board");
@@ -421,18 +421,19 @@ public class Robot extends TimedRobot {
         //they didnt like my code so i took it out - would run if at bottom
 
         //now runs backward with x and forwards with Y
-       if (testIntake){
+    if (!bottomLimitSwitchIntake.get()){
+      if (testIntake)
         intake.set(Statics.Intake_Speed);
-      } else if (reverseIntake){
+      else if (reverseIntake)
         intake.set(-Statics.Intake_Speed);
-      } else {
+      else 
         intake.set(0);
-      }
+    }
 
       //defaults movement to go up - if B button - go up until limit switch
-      if (topLimitSwitch.get() && liftIntake) 
+      if (topLimitSwitchIntake.get() && liftIntake) 
         intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-      else if (bottomLimitSwitch.get() && lowerAndShoot)
+      else if (bottomLimitSwitchIntake.get() && lowerAndShoot)
         intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
       else 
          intakeUpDown.set(0);
@@ -464,7 +465,7 @@ public class Robot extends TimedRobot {
   }
   //needs some work - start case at angle 0
   public void shooterSetAngle(double previousAngle){
-    /*
+    
     if (previousAngle == 0)
       angleAdjuster.setAngle(15);
     else if (previousAngle == 15){
@@ -472,7 +473,7 @@ public class Robot extends TimedRobot {
     }
     else if (previousAngle == 30)
       angleAdjuster.setAngle(15);
- */
+ 
     }
 
   public void shuffleboardStartup(){

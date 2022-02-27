@@ -28,6 +28,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import java.util.*;
 
+import javax.lang.model.util.ElementScanner6;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
@@ -295,7 +297,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    controlIntake(gp2.getAButton(), gp2.getBButton(), gp1.getXButton(), gp1.getYButton());    
+    controlIntake(gp2.getAButtonPressed(), gp1.getXButton(), gp1.getYButton());    
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
 
     climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV(), gp1.getLeftStickButtonPressed());
@@ -423,7 +425,7 @@ public class Robot extends TimedRobot {
   }
 
   //If button is pressed move until limit switch
-  public void controlIntake(boolean lowerAndShoot, boolean liftIntake, boolean reverseIntake, boolean testIntake){
+  public void controlIntake(boolean moveIntake, boolean reverseIntake, boolean testIntake){
       //Controls actual intake - only on if at bottom
      // if (bottomLimitSwitch.get() && lowerAndShoot) {
         //intake.set(Statics.Intake_Speed);
@@ -439,16 +441,28 @@ public class Robot extends TimedRobot {
         intake.set(0);
     }
 
+    if (!goingUp){
+      if (bottomLimitSwitchIntake.get() && moveIntake) {
+        intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
+        goingUp = true;
+    } 
+  } else if (topLimitSwitchIntake.get() && moveIntake){
+      intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
+      goingUp = false;
+  }
+    else
+      intakeUpDown.set(0);
       //defaults movement to go up - if B button - go up until limit switch
-      if (topLimitSwitchIntake.get() && liftIntake) 
+      /*
+      if (topLimitSwitchIntake.get() && moveIntake) 
         intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-      else if (bottomLimitSwitchIntake.get() && lowerAndShoot)
+      else if (bottomLimitSwitchIntake.get() && moveIntake)
         intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
       else 
          intakeUpDown.set(0);
-      //If we're not going up, figure out if we want to go down until bottom limit switch
-        
-        
+
+      If we're not going up, figure out if we want to go down until bottom limit switch
+      */
         
   }
   

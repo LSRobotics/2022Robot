@@ -286,7 +286,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    climbRatchet.set(0);
+  }
 
   /** This function is called periodically during operator control. */
   @Override
@@ -296,7 +298,8 @@ public class Robot extends TimedRobot {
     controlIntake(gp2.getAButton(), gp2.getBButton(), gp1.getXButton(), gp1.getYButton());    
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
 
-    climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV());
+    climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV(), gp1.getLeftStickButtonPressed());
+
     if(gp2.getLeftStickButtonPressed())
       shooterSetAngle(servoAngle);
 
@@ -365,7 +368,7 @@ public class Robot extends TimedRobot {
     }
   }
 
-  public void climb(boolean up, boolean down, int horizontalDirection){
+  public void climb(boolean up, boolean down, int horizontalDirection, boolean ratchetButton){
     if (up){
       verticalClimb.set(Statics.Vertical_Climb_Speed);
     } else if (down) {
@@ -380,6 +383,12 @@ public class Robot extends TimedRobot {
       horizontalClimb.set(-Statics.Horizontal_Climb_Speed);
     } else {
       horizontalClimb.set(0);
+    }
+
+    if (ratchetButton && climbRatchet.get() == 0){
+      climbRatchet.set(0.25);
+    } else if (ratchetButton && climbRatchet.get() == 0.25){
+      climbRatchet.set(0);
     }
 
   }

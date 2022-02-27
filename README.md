@@ -17,6 +17,8 @@ Move Intake Up - B Button
 Reverse Intake - X Button
 
 Test Intake - Y Button
+
+Climb Ratchet - Left Stick Button
   
 ### Gamepad 2
 
@@ -27,6 +29,8 @@ Decrease Shooter Speed - Left Bumper
 Start Shooter & Automated Index - Y Button
 
 Change Camera - Start Button
+
+Shooting Hood Adjuster - Left Stick Button
 
 -----------------------------------------------  
 

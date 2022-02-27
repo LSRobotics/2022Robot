@@ -170,7 +170,7 @@ public class Robot extends TimedRobot {
     bl_drive.setOpenLoopRampRate(0.5);
     br_drive.setOpenLoopRampRate(0.5);
     
-    pdp = new PowerDistribution(0, ModuleType.kCTRE);
+    pdp = new PowerDistribution();
     
     ultrasonic = new AnalogInput(Statics.ultrasonic);
 

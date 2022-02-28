@@ -165,6 +165,7 @@ public class Robot extends TimedRobot {
 
     left_motors = new MotorControllerGroup(fl_drive, bl_drive);
     right_motors = new MotorControllerGroup(fr_drive, br_drive);
+    right_motors.setInverted(true);
     drive = new DifferentialDrive(left_motors, right_motors);
 
     fl_drive.setOpenLoopRampRate(0.5);
@@ -426,20 +427,15 @@ public class Robot extends TimedRobot {
 
   //If button is pressed move until limit switch
   public void controlIntake(boolean moveIntake, boolean reverseIntake, boolean testIntake){
-      //Controls actual intake - only on if at bottom
-     // if (bottomLimitSwitch.get() && lowerAndShoot) {
-        //intake.set(Statics.Intake_Speed);
-        //they didnt like my code so i took it out - would run if at bottom
-
         //now runs backward with x and forwards with Y
-    if (!bottomLimitSwitchIntake.get()){
+    //if (!bottomLimitSwitchIntake.get()){
       if (testIntake)
         intake.set(Statics.Intake_Speed);
       else if (reverseIntake)
         intake.set(-Statics.Intake_Speed);
       else 
         intake.set(0);
-    }
+    //}
 
     if (!goingUp){
       if (bottomLimitSwitchIntake.get() && moveIntake) {
@@ -451,19 +447,7 @@ public class Robot extends TimedRobot {
       goingUp = false;
   }
     else
-      intakeUpDown.set(0);
-      //defaults movement to go up - if B button - go up until limit switch
-      /*
-      if (topLimitSwitchIntake.get() && moveIntake) 
-        intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-      else if (bottomLimitSwitchIntake.get() && moveIntake)
-        intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
-      else 
-         intakeUpDown.set(0);
-
-      If we're not going up, figure out if we want to go down until bottom limit switch
-      */
-        
+      intakeUpDown.set(0);  
   }
   
   public void controlShooter(boolean shoot, boolean raiseSpeed, boolean lowerSpeed){

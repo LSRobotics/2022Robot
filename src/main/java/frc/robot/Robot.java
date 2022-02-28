@@ -269,6 +269,8 @@ public class Robot extends TimedRobot {
       // - the targetValue is the value whatever the specific AutonMode is measuring should reach
 
       setAuton(autonModes[autoIncrement], autonArguments[autoIncrement]);
+      System.out.println(autonModes[autoIncrement].toString());
+      System.out.println(autonArguments[autoIncrement].toString());
       //auton 1
         //starting position: directly under hub
         //wait a variable amount of seconds (allow it to be changed in dashboard)

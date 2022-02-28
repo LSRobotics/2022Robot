@@ -40,6 +40,7 @@ import edu.wpi.first.math.controller.PIDController;
 import java.awt.Desktop;
 import java.io.*;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 
 //import frc.robot.Constants.Statics;
@@ -224,17 +225,22 @@ public class Robot extends TimedRobot {
     autonConditionCompleted = true;
     currentAuton = AutonMode.NONE;
     ArrayList<AutonMode> tempAutonModes = new ArrayList<AutonMode>();
-    ArrayList<Object[]> tempAutonArguments = new ArrayList<Object[]>();
+    ArrayList<String[]> tempAutonArguments = new ArrayList<String[]>();
 
     //Spaghetti code:
-    File autonInstructionFile = new File(Filesystem.getDeployDirectory().getPath() + "\\autonInstructions.txt");
+    File autonInstructionFile = new File(Filesystem.getDeployDirectory().getPath() + "/autonInstructions.txt");
     try (Scanner input = new Scanner(autonInstructionFile)) {
       while (input.hasNext()) {
         String line = input.nextLine();
         Scanner lineInput = new Scanner(line); //another scanner so you can use the delimiters
         lineInput.useDelimiter(", ");
         tempAutonModes.add(AutonMode.valueOf(lineInput.next().toUpperCase()));
-        tempAutonArguments.add(lineInput.tokens().toArray());
+        ArrayList<String> tempLineArgs = new ArrayList<String>();
+        for (String x : lineInput.tokens().collect(Collectors.toList())) {
+          tempLineArgs.add(x);
+        }
+        tempAutonArguments.add(tempLineArgs.toArray(new String[0]));
+        System.out.println(lineInput.tokens().toArray());
         lineInput.close();
       }
       input.close();
@@ -246,7 +252,6 @@ public class Robot extends TimedRobot {
     autonModes = tempAutonModes.toArray(new AutonMode[0]); //TODO: check and see if you need to do `tempAutonModes.size()` instead of `0`
     autonArguments = tempAutonArguments.toArray(new String[0][0]);
   }
-
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
@@ -450,7 +455,7 @@ public class Robot extends TimedRobot {
     //navXEntry.setDouble(navXAngle)
   }
   public void updateInputs(){
-    pdpNum = pdp.getVoltage();
+    //pdpNum = pdp.getVoltage();
     distance = getRangeInches(ultrasonic.getValue());
     leftMotorN = fl_drive.get();
     rightMotorN = fr_drive.get();

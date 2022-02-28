@@ -12,6 +12,8 @@ public class Statics {
     public final static int Back_Left_Motor_ID = 3;
     public final static int Back_Right_Motor_ID = 4;
 
+    
+
     public final static int Vertical_Climb_Motor_ID = 11;
     public final static int Horizontal_Climb_Motor_ID = 12; 
     public final static int Climb_Ratchet_ID = 3;
@@ -20,14 +22,14 @@ public class Statics {
     public final static double Horizontal_Climb_Speed = 0.5;
 
     public final static double Index_Speed = .5;
-    public final static double Intake_Speed = .35;
+    public final static double Intake_Speed = .6;
     public final static double IntakeUppeyDowneySpeed = 0.9;
 
     //Just for now
     public final static double Shooter_Target_RPM = 0;
     public final static double Shooter_Speed = 0.5;
     
-
+    public final static double Max_Move_Speed = .35;
     //weight for cubic function
     public final static double Weight = 0.5;
     public final static double deadbandCutoff = 0.1;

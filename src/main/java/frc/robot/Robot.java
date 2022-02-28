@@ -351,8 +351,8 @@ public class Robot extends TimedRobot {
   }
 
   private void driveTrain(double power, double turn) {
-    drive.arcadeDrive(cubicScaledDeadband(power, Statics.deadbandCutoff, Statics.Weight),
-                      cubicScaledDeadband(turn, Statics.deadbandCutoff, Statics.Weight));
+    drive.arcadeDrive(Statics.Max_Move_Speed*cubicScaledDeadband(power, Statics.deadbandCutoff, Statics.Weight),
+                      Statics.Max_Move_Speed*cubicScaledDeadband(turn, Statics.deadbandCutoff, Statics.Weight));
   }
 
   private double cubic(double x, double w){

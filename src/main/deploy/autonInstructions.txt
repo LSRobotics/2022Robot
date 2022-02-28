@@ -1,0 +1,13 @@
+drive, 2.4
+turn, -45
+drive, 2.5
+deployintake
+intakeon
+drive, .25
+wait, 2
+intakeoff
+turn, 180
+drive, 2.75
+turn, 45
+drive, 2.5
+shoot, 2

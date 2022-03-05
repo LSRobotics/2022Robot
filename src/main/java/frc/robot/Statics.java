@@ -20,13 +20,15 @@ public class Statics {
     public final static double Horizontal_Climb_Speed = 0.5;
 
     public final static double Index_Speed = .5;
-    public final static double Intake_Speed = .35;
+    public final static double Intake_Speed = .6;
     public final static double IntakeUppeyDowneySpeed = 0.9;
 
     //Just for now
     public final static double Shooter_Target_RPM = 0;
     public final static double Shooter_Speed = 0.5;
     
+    public final static double Drive_Speed = 0.7;
+    public final static double Turn_Speed = 0.5;
 
     //weight for cubic function
     public final static double Weight = 0.5;

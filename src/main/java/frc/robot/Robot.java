@@ -181,7 +181,7 @@ public class Robot extends TimedRobot {
     ultrasonic = new AnalogInput(Statics.ultrasonic);
 
     shuffleboardStartup();
-    LED.set(-0.95);
+    LED.set(-0.65);
     
     movePid = new PIDController(Statics.movementPIDp, Statics.movementPIDi, Statics.movementPidd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
     gyroPid = new PIDController(Statics.gyroPIDp, Statics.gyroPIDi, Statics.gyroPIDd); //TODO: figure out the kP, kI, and kD values required for actual instantiation

@@ -82,6 +82,7 @@ public class Robot extends TimedRobot {
   public Spark intake;
   public Spark index;
   public Spark intakeUpDown;
+  public Spark LED;
 
   double pdpNum;
   double distance;
@@ -122,6 +123,8 @@ public class Robot extends TimedRobot {
   NetworkTableEntry shooterRPMEntry;
   SimpleWidget navXEntry;
   ComplexWidget cameraTest;
+
+
 
   //AutonInit
   private PIDController movePid;
@@ -178,7 +181,7 @@ public class Robot extends TimedRobot {
     ultrasonic = new AnalogInput(Statics.ultrasonic);
 
     shuffleboardStartup();
-
+    LED.set(-0.95);
     
     movePid = new PIDController(Statics.movementPIDp, Statics.movementPIDi, Statics.movementPidd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
     gyroPid = new PIDController(Statics.gyroPIDp, Statics.gyroPIDi, Statics.gyroPIDd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
@@ -338,6 +341,7 @@ public class Robot extends TimedRobot {
     intake = new Spark(Statics.Intake_Motor_ID);
     index = new Spark(Statics.Index_Motor_ID);
     intakeUpDown = new Spark(Statics.Intake_Up_Down_Motor_ID);
+    LED = new Spark(Statics.ledControllerID);
     
     fl_drive = new CANSparkMax(Statics.Front_Left_Motor_ID, MotorType.kBrushless);
     fr_drive = new CANSparkMax(Statics.Front_Right_Motor_ID, MotorType.kBrushless);

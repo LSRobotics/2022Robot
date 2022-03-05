@@ -301,7 +301,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    controlIntake(gp2.getAButtonPressed(), gp1.getXButton(), gp1.getYButton());    
+    controlIntake(gp2.getBButtonPressed(), gp1.getXButton(), gp1.getYButton());    
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
 
     climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV(), gp1.getLeftStickButtonPressed());

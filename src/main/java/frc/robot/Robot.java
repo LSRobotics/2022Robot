@@ -183,7 +183,7 @@ public class Robot extends TimedRobot {
     
     pdp = new PowerDistribution();
     
-    ballIrSensor = new AnalogInput(0);
+    ballIRSensor = new AnalogInput(0);
 
     shuffleboardStartup();
     LED.set(-0.65);
@@ -515,12 +515,6 @@ public class Robot extends TimedRobot {
     .withSize(2, 1)
     .withPosition(2, 0)
     .getEntry();
-    
-    ultrasonicDistance = testTab.add("Distance to target", 0)
-    .withWidget(BuiltInWidgets.kDial)
-    .withSize(3, 2)
-    .withPosition(0, 3)
-    .getEntry();
 
     pdpVoltage = testTab.add("PDP voltage", 0)
     .withWidget(BuiltInWidgets.kVoltageView)
@@ -549,12 +543,6 @@ public class Robot extends TimedRobot {
     .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)
     .withPosition(2, 0)
-    .getEntry(); 
-    
-    ultrasonicDistance = compTab.add("Distance to target", 0)
-    .withWidget(BuiltInWidgets.kDial)
-    .withSize(3, 2)
-    .withPosition(0, 3)
     .getEntry();
 
     pdpVoltage = compTab.add("PDP voltage", 0)

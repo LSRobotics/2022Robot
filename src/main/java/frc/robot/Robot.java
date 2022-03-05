@@ -239,6 +239,7 @@ public class Robot extends TimedRobot {
         for (String x : lineInput.tokens().collect(Collectors.toList())) {
           tempLineArgs.add(x);
         }
+        System.out.println("QQQQ");
         tempAutonArguments.add(tempLineArgs.toArray(new String[0]));
         System.out.println(lineInput.tokens().toArray());
         lineInput.close();
@@ -308,9 +309,10 @@ public class Robot extends TimedRobot {
           //double turn = error;
           
           double valueToCalculate = (getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters;
+          //System.out.println(movePid.getSetpoint());
           double rawValue = movePid.calculate(valueToCalculate);
           double driveValue = MathUtil.clamp(rawValue, -1, 1);
-          drive.arcadeDrive(driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
+          drive.arcadeDrive(Statics.Drive_Speed*driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
           if (movePid.atSetpoint()) {
             autonConditionCompleted = true;
           }
@@ -350,6 +352,7 @@ public class Robot extends TimedRobot {
 
     climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV(), gp1.getLeftStickButtonPressed());
 
+    System.out.println(getAverageEncoderDistance());
     if(gp2.getLeftStickButtonPressed())
       shooterSetAngle(servoAngle);
 
@@ -655,6 +658,8 @@ public class Robot extends TimedRobot {
       case DRIVE:
         autonStartingPos = getAverageEncoderDistance();
         movePid.setSetpoint(Double.parseDouble(targetValue[0]) + (autonStartingPos/Statics.SensorToMeters));
+        System.out.println("target value" + Double.parseDouble(targetValue[0]));
+        System.out.println("Starting position"+ autonStartingPos);
         break;
       case TURN:
         //ahrs.reset();

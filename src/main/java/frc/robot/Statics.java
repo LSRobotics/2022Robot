@@ -48,7 +48,7 @@ public class Statics {
     
     //TODO determine if `public static double inchToSensorUnits = 2148.15278;` did anything
     
-    public final static double SensorToMeters = 45347.75; //TODO this is not right
+    public final static double SensorToMeters = -1.90469; 
 
     public final static double movementPIDp = 1;
     public final static double movementPIDi = 0;

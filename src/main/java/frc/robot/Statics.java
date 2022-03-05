@@ -21,8 +21,8 @@ public class Statics {
     public final static double Vertical_Climb_Speed = 0.5;
     public final static double Horizontal_Climb_Speed = 0.5;
 
-    public final static double Index_Speed = .5;
-    public final static double Intake_Speed = .6;
+    public final static double Index_Speed = -.5;
+    public final static double Intake_Speed = .8;
     public final static double IntakeUppeyDowneySpeed = 0.9;
 
     //Just for now

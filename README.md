@@ -9,17 +9,21 @@ An FRC Robot for the 2022 FIRST Robotics Season
 ### Gamepad 1
 
 Moving - Arcade Drive - Cubic scaled deadband using left Y-axis and right X-axis
-  
-Move Intake Down & Run - A Button
-  
+
 Move Intake Up - B Button
 
 Reverse Intake - X Button
 
-Test Intake - Y Button
+Intake In - Y Button
 
 Climb Ratchet - Left Stick Button
+
+Climb Up - Right Bumper 
   
+Climb Down - Left Bumper
+
+Climb Horizontal - Dpad
+
 ### Gamepad 2
 
 Increase Shooter Speed - Right Bumper

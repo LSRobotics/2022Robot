@@ -93,6 +93,7 @@ public class Robot extends TimedRobot {
   double indexN;
   double shooterRPM;
   double navXAngle;
+  double ratchetPos;
 
   public XboxController gp1;
   public XboxController gp2;
@@ -121,6 +122,7 @@ public class Robot extends TimedRobot {
   NetworkTableEntry IndexTable;
   NetworkTableEntry IntakeTable;
   NetworkTableEntry shooterRPMEntry;
+  NetworkTableEntry ratchetEngaged;
   SimpleWidget navXEntry;
   ComplexWidget cameraTest;
 
@@ -410,6 +412,10 @@ public class Robot extends TimedRobot {
     IntakeTable.setDouble(intakeN);
 
     shooterRPMEntry.setDouble(shooterRPM);
+    if (ratchetPos > 45)
+      ratchetEngaged.setBoolean(true);
+    else
+      ratchetEngaged.setBoolean(false);
     
     //navXEntry.setDouble(navXAngle)
   }
@@ -422,6 +428,7 @@ public class Robot extends TimedRobot {
     shooterN = shooter.get();
     indexN = index.get();
     intakeN = intake.get();
+    ratchetPos = climbRatchet.getAngle();
 
     //shooterRPM = 0;
     shooter.getSelectedSensorVelocity();
@@ -589,6 +596,11 @@ public class Robot extends TimedRobot {
     .withPosition(7, 4)
     .getEntry();
 
+    ratchetEngaged = compTab.add("Ratchet", true)
+    .withWidget(BuiltInWidgets.kBooleanBox)
+    .withSize(1,1)
+    .withPosition(3,3)
+    .getEntry();
     /*
     compTab.add("navX Angle", navX)
     .withWidget(BuiltInWidgets.kGyro)

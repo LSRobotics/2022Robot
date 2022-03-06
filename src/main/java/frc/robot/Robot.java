@@ -34,6 +34,8 @@ import javax.lang.model.util.ElementScanner6;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
+import edu.wpi.first.wpilibj.AnalogInput;
+
 //import com.kauailabs.navx.frc.AHRS;
 //import edu.wpi.first.wpilibj.SPI; //TODO: change the port system depending on what we actually use
 
@@ -84,9 +86,12 @@ public class Robot extends TimedRobot {
 
   public WPI_TalonFX shooter;
 
+  public AnalogInput ballIRSensor;
+
   public Spark intake;
   public Spark index;
   public Spark intakeUpDown;
+  public Spark LED;
 
   double pdpNum;
   double distance;
@@ -97,6 +102,7 @@ public class Robot extends TimedRobot {
   double indexN;
   double shooterRPM;
   double navXAngle;
+  double ratchetPos;
 
   public XboxController gp1;
   public XboxController gp2;
@@ -119,14 +125,16 @@ public class Robot extends TimedRobot {
   ShuffleboardTab compTab = Shuffleboard.getTab("Competition Board");
   NetworkTableEntry rightMotorNetworkTable;
   NetworkTableEntry leftMotorNetworkTable;
-  NetworkTableEntry ultrasonicDistance;
   NetworkTableEntry pdpVoltage;
   NetworkTableEntry ShooterTable;
   NetworkTableEntry IndexTable;
   NetworkTableEntry IntakeTable;
   NetworkTableEntry shooterRPMEntry;
+  NetworkTableEntry ratchetEngaged;
   SimpleWidget navXEntry;
   ComplexWidget cameraTest;
+
+
 
   //AutonInit
   private PIDController movePid;
@@ -183,10 +191,10 @@ public class Robot extends TimedRobot {
     
     pdp = new PowerDistribution();
     
-    ultrasonic = new AnalogInput(Statics.ultrasonic);
+    ballIRSensor = new AnalogInput(0);
 
     shuffleboardStartup();
-
+    LED.set(-0.65);
     
     movePid = new PIDController(Statics.movementPIDp, Statics.movementPIDi, Statics.movementPidd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
     gyroPid = new PIDController(Statics.gyroPIDp, Statics.gyroPIDi, Statics.gyroPIDd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
@@ -347,7 +355,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    controlIntake(gp2.getAButtonPressed(), gp1.getXButton(), gp1.getYButton());    
+    controlIntake(gp2.getBButtonPressed(), gp1.getXButton(), gp1.getYButton());    
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
 
     climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV(), gp1.getLeftStickButtonPressed());
@@ -358,7 +366,7 @@ public class Robot extends TimedRobot {
 
     if(gp2.getStartButtonPressed())
       Camera.changeCam();
-      //hehe
+
   }
 
   /** This function is called once when the robot is disabled. */
@@ -388,6 +396,7 @@ public class Robot extends TimedRobot {
     intake = new Spark(Statics.Intake_Motor_ID);
     index = new Spark(Statics.Index_Motor_ID);
     intakeUpDown = new Spark(Statics.Intake_Up_Down_Motor_ID);
+    LED = new Spark(Statics.ledControllerID);
     
     fl_drive = new CANSparkMax(Statics.Front_Left_Motor_ID, MotorType.kBrushless);
     fr_drive = new CANSparkMax(Statics.Front_Right_Motor_ID, MotorType.kBrushless);
@@ -447,7 +456,6 @@ public class Robot extends TimedRobot {
   }
   public void updateNetworkEntries(){
     pdpVoltage.setDouble(pdpNum);
-    ultrasonicDistance.setDouble(distance);
     rightMotorNetworkTable.setDouble(rightMotorN);
     leftMotorNetworkTable.setDouble(leftMotorN);
 
@@ -456,18 +464,22 @@ public class Robot extends TimedRobot {
     IntakeTable.setDouble(intakeN);
 
     shooterRPMEntry.setDouble(shooterRPM);
+    if (ratchetPos > 45)
+      ratchetEngaged.setBoolean(true);
+    else
+      ratchetEngaged.setBoolean(false);
     
     //navXEntry.setDouble(navXAngle)
   }
   public void updateInputs(){
     //pdpNum = pdp.getVoltage();
-    distance = getRangeInches(ultrasonic.getValue());
     leftMotorN = fl_drive.get();
     rightMotorN = fr_drive.get();
 
     shooterN = shooter.get();
     indexN = index.get();
     intakeN = intake.get();
+    ratchetPos = climbRatchet.getAngle();
 
     //shooterRPM = 0;
     shooter.getSelectedSensorVelocity();
@@ -488,11 +500,11 @@ public class Robot extends TimedRobot {
     //}
 
     if (!goingUp){
-      if (bottomLimitSwitchIntake.get() && moveIntake) {
+      if (!bottomLimitSwitchIntake.get() && moveIntake) {
         intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
         goingUp = true;
     } 
-  } else if (topLimitSwitchIntake.get() && moveIntake){
+  } else if (!topLimitSwitchIntake.get() && moveIntake){
       intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
       goingUp = false;
   }
@@ -500,6 +512,10 @@ public class Robot extends TimedRobot {
       intakeUpDown.set(0);  
   }
   
+  public boolean scanForBalls(){
+    return Math.pow(ballIRSensor.getAverageVoltage(), -1.2045) * 27.726 < 15;
+  }
+
   public void controlShooter(boolean shoot, boolean raiseSpeed, boolean lowerSpeed){
     if(gp2.getYButton()) {
       shooter.set(shooterSpeed);
@@ -548,12 +564,6 @@ public class Robot extends TimedRobot {
     .withSize(2, 1)
     .withPosition(2, 0)
     .getEntry();
-    
-    ultrasonicDistance = testTab.add("Distance to target", 0)
-    .withWidget(BuiltInWidgets.kDial)
-    .withSize(3, 2)
-    .withPosition(0, 3)
-    .getEntry();
 
     pdpVoltage = testTab.add("PDP voltage", 0)
     .withWidget(BuiltInWidgets.kVoltageView)
@@ -582,12 +592,6 @@ public class Robot extends TimedRobot {
     .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)
     .withPosition(2, 0)
-    .getEntry(); 
-    
-    ultrasonicDistance = compTab.add("Distance to target", 0)
-    .withWidget(BuiltInWidgets.kDial)
-    .withSize(3, 2)
-    .withPosition(0, 3)
     .getEntry();
 
     pdpVoltage = compTab.add("PDP voltage", 0)
@@ -635,6 +639,11 @@ public class Robot extends TimedRobot {
     .withPosition(7, 4)
     .getEntry();
 
+    ratchetEngaged = compTab.add("Ratchet", true)
+    .withWidget(BuiltInWidgets.kBooleanBox)
+    .withSize(1,1)
+    .withPosition(3,3)
+    .getEntry();
     /*
     compTab.add("navX Angle", navX)
     .withWidget(BuiltInWidgets.kGyro)

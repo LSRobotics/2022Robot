@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import java.util.*;
 
@@ -38,6 +39,10 @@ import edu.wpi.first.wpilibj.AnalogInput;
 //import com.kauailabs.navx.frc.AHRS;
 //import edu.wpi.first.wpilibj.SPI; //TODO: change the port system depending on what we actually use
 
+import java.awt.Desktop;
+import java.io.*;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 
 //import frc.robot.Constants.Statics;
@@ -142,8 +147,15 @@ public class Robot extends TimedRobot {
   private enum AutonMode {
     DRIVE, 
     TURN,
+    SHOOT,
+    DEPLOYINTAKE,
+    INTAKEON,
+    INTAKEOFF,
+    WAIT,
     NONE
   }
+  AutonMode[] autonModes;
+  String[][] autonArguments;
 
   private AutonMode currentAuton;
 
@@ -152,11 +164,6 @@ public class Robot extends TimedRobot {
   private double autonTarget;
 
   private double autonStartingPos;
-
-  /*private Object[][] AutonInstructions = {
-    {AutonMode.DRIVE, 10}
-  };      // this could be cool but is not practical right now*/
-
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -170,6 +177,7 @@ public class Robot extends TimedRobot {
     initializeMotorControllers();
 
     initializeGamePad();
+    
 
     left_motors = new MotorControllerGroup(fl_drive, bl_drive);
     right_motors = new MotorControllerGroup(fr_drive, br_drive);
@@ -224,8 +232,35 @@ public class Robot extends TimedRobot {
     autoIncrement = -1;
     autonConditionCompleted = true;
     currentAuton = AutonMode.NONE;
-  }
+    ArrayList<AutonMode> tempAutonModes = new ArrayList<AutonMode>();
+    ArrayList<String[]> tempAutonArguments = new ArrayList<String[]>();
 
+    //Spaghetti code:
+    File autonInstructionFile = new File(Filesystem.getDeployDirectory().getPath() + "/autonInstructions.txt");
+    try (Scanner input = new Scanner(autonInstructionFile)) {
+      while (input.hasNext()) {
+        String line = input.nextLine();
+        Scanner lineInput = new Scanner(line); //another scanner so you can use the delimiters
+        lineInput.useDelimiter(", ");
+        tempAutonModes.add(AutonMode.valueOf(lineInput.next().toUpperCase()));
+        ArrayList<String> tempLineArgs = new ArrayList<String>();
+        for (String x : lineInput.tokens().collect(Collectors.toList())) {
+          tempLineArgs.add(x);
+        }
+        System.out.println("QQQQ");
+        tempAutonArguments.add(tempLineArgs.toArray(new String[0]));
+        System.out.println(lineInput.tokens().toArray());
+        lineInput.close();
+      }
+      input.close();
+    } catch (FileNotFoundException e) {
+      //Auto-Generated catch block :)
+      e.printStackTrace();
+    }
+    
+    autonModes = tempAutonModes.toArray(new AutonMode[0]); //TODO: check and see if you need to do `tempAutonModes.size()` instead of `0`
+    autonArguments = tempAutonArguments.toArray(new String[0][0]);
+  }
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
@@ -241,19 +276,32 @@ public class Robot extends TimedRobot {
       // - SetAuton(AutonMode, targetValue) is the main function being used currently.
       // - Current AutonModes are `DRIVE` and `TURN`, with `NONE` being just to do nothing
       // - the targetValue is the value whatever the specific AutonMode is measuring should reach
-      
-      switch (autoIncrement) {
-        case 0:
-          setAuton(AutonMode.DRIVE, .5);
-          break;
-        case 1:
-          setAuton(AutonMode.TURN, 90);
-          break;
-        default:
-          setAuton(AutonMode.NONE, 0);
-          break;
-      }
 
+      setAuton(autonModes[autoIncrement], autonArguments[autoIncrement]);
+      System.out.println(autonModes[autoIncrement].toString());
+      System.out.println(autonArguments[autoIncrement].toString());
+      //auton 1
+        //starting position: directly under hub
+        //wait a variable amount of seconds (allow it to be changed in dashboard)
+        //shoot the ball directly into the low goal
+        //turn to face position 1 (see plans)
+        //move away (to get out of the way of others)
+      //auton 2
+        //starting position: directly under hub
+        //wait a variable amount of seconds (allow it to be changed in dashboard)
+        //shoot the ball directly into the low goal
+        //turn to face position 1 (see plans)
+        //move away (to get out of the way of others)
+        //drop intake
+        //pick up ball (predetermined position)
+        //turn to aim back at goal
+        //shoot the ball into either low or high
+      //auton 3
+        //drop intake
+        //move to pick up cargo
+        //turn to aim at goal
+        //move into position
+        //score goal
       autonConditionCompleted = false;
       System.out.println("Started Next Auton Instruction");
       drive.arcadeDrive(0,0);
@@ -269,9 +317,10 @@ public class Robot extends TimedRobot {
           //double turn = error;
           
           double valueToCalculate = (getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters;
+          //System.out.println(movePid.getSetpoint());
           double rawValue = movePid.calculate(valueToCalculate);
           double driveValue = MathUtil.clamp(rawValue, -1, 1);
-          drive.arcadeDrive(driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
+          drive.arcadeDrive(Statics.Drive_Speed*driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
           if (movePid.atSetpoint()) {
             autonConditionCompleted = true;
           }
@@ -311,6 +360,7 @@ public class Robot extends TimedRobot {
 
     climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV(), gp1.getLeftStickButtonPressed());
 
+    System.out.println(getAverageEncoderDistance());
     if(gp2.getLeftStickButtonPressed())
       shooterSetAngle(servoAngle);
 
@@ -360,8 +410,8 @@ public class Robot extends TimedRobot {
   }
 
   private void driveTrain(double power, double turn) {
-    drive.arcadeDrive(Statics.Max_Move_Speed*cubicScaledDeadband(power, Statics.deadbandCutoff, Statics.Weight),
-                      Statics.Max_Move_Speed*cubicScaledDeadband(turn, Statics.deadbandCutoff, Statics.Weight));
+    drive.arcadeDrive(Statics.Drive_Speed*cubicScaledDeadband(power, Statics.deadbandCutoff, Statics.Weight),
+                      Statics.Turn_Speed*cubicScaledDeadband(turn, Statics.deadbandCutoff, Statics.Weight));
   }
 
   private double cubic(double x, double w){
@@ -608,19 +658,39 @@ public class Robot extends TimedRobot {
     .withPosition(3, 3);
     */
   }
-  
-  private void setAuton(AutonMode mode, double targetValue) {
+
+  private void setAuton(AutonMode mode, String[] targetValue) {
     currentAuton = mode;
-    autonTarget = targetValue;
+    autonTarget = Double.parseDouble(targetValue[0]);
 
     switch (mode) {
       case DRIVE:
         autonStartingPos = getAverageEncoderDistance();
-        movePid.setSetpoint(targetValue + (autonStartingPos/Statics.SensorToMeters));
+        movePid.setSetpoint(Double.parseDouble(targetValue[0]) + (autonStartingPos/Statics.SensorToMeters));
+        System.out.println("target value" + Double.parseDouble(targetValue[0]));
+        System.out.println("Starting position"+ autonStartingPos);
         break;
       case TURN:
         //ahrs.reset();
-        gyroPid.setSetpoint(targetValue);
+        gyroPid.setSetpoint(Double.parseDouble(targetValue[0]));
+        break;
+      case SHOOT:
+        //shoot code
+        break;
+      case DEPLOYINTAKE:
+        //deploy the intake by applying speed to the motor
+        break;
+      case INTAKEON:
+
+        autonConditionCompleted = true;
+        break;
+      case INTAKEOFF:
+
+        autonConditionCompleted = true;
+        break;
+      case WAIT:
+        //start a timer
+        //auton condition completed when timer reaches desired time
         break;
       case NONE:
       default:
@@ -628,6 +698,8 @@ public class Robot extends TimedRobot {
         break;
     }
   }
+
+  //setAuton([);
 
   /* gAED:
     - Gets the average encoder distance in each of the main drive motors

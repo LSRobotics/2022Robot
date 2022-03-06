@@ -422,8 +422,7 @@ public class Robot extends TimedRobot {
     //navXEntry.setDouble(navXAngle)
   }
   public void updateInputs(){
-    pdpNum = pdp.getVoltage();
-    distance = getRangeInches(ultrasonic.getValue());
+    //pdpNum = pdp.getVoltage();
     leftMotorN = fl_drive.get();
     rightMotorN = fr_drive.get();
 

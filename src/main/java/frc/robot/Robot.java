@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
   public Servo climbRatchet;
 
   public WPI_TalonFX verticalClimb;
-  public WPI_TalonFX horizontalClimb;
+  public Spark horizontalClimb;
 
   public WPI_TalonFX shooter;
 
@@ -291,6 +291,7 @@ public class Robot extends TimedRobot {
           drive.arcadeDrive(0,0);
           break;
       }
+    
     }
     
   }
@@ -354,7 +355,7 @@ public class Robot extends TimedRobot {
     br_drive = new CANSparkMax(Statics.Back_Right_Motor_ID, MotorType.kBrushless);
 
     verticalClimb = new WPI_TalonFX(Statics.Vertical_Climb_Motor_ID);
-    horizontalClimb = new WPI_TalonFX(Statics.Horizontal_Climb_Motor_ID);
+    horizontalClimb = new Spark(Statics.Horizontal_Climb_Motor_ID);
     climbRatchet = new Servo(Statics.Climb_Ratchet_ID);
     
   }
@@ -388,7 +389,7 @@ public class Robot extends TimedRobot {
     } else {
       verticalClimb.set(0);
     }
-
+    
     if (horizontalDirection == 90){
       horizontalClimb.set(Statics.Horizontal_Climb_Speed);
     } else if (horizontalDirection == 270){
@@ -398,8 +399,8 @@ public class Robot extends TimedRobot {
     }
 
     if (ratchetButton && climbRatchet.get() == 0){
-      climbRatchet.set(0.25);
-    } else if (ratchetButton && climbRatchet.get() == 0.25){
+      climbRatchet.set(1);
+    } else if (ratchetButton && climbRatchet.get() == 1){
       climbRatchet.set(0);
     }
 

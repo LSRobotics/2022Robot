@@ -15,7 +15,7 @@ public class Statics {
     
 
     public final static int Vertical_Climb_Motor_ID = 11;
-    public final static int Horizontal_Climb_Motor_ID = 12; 
+    public final static int Horizontal_Climb_Motor_ID = 8; 
     public final static int Climb_Ratchet_ID = 3;
 
     public final static double Vertical_Climb_Speed = 0.5;

@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-
-/** Add your docs here. */
 public class Statics {
     public final static int Front_Left_Motor_ID = 1;
     public final static int Front_Right_Motor_ID = 2;
@@ -23,13 +21,16 @@ public class Statics {
 
     public final static double Index_Speed = -.5;
     public final static double Intake_Speed = .8;
+
     public final static double IntakeUppeyDowneySpeed = 0.9;
 
     //Just for now
     public final static double Shooter_Target_RPM = 0;
     public final static double Shooter_Speed = 0.5;
     
-    public final static double Max_Move_Speed = .35;
+    public final static double Drive_Speed = 0.7;
+    public final static double Turn_Speed = 0.5;
+  
     //weight for cubic function
     public final static double Weight = 0.5;
     public final static double deadbandCutoff = 0.1;
@@ -46,7 +47,7 @@ public class Statics {
     
     public static double cm_to_in = 0.049212598;
     
-    public final static double SensorToMeters = 45347.75; //TODO this is not right
+    public final static double SensorToMeters = -1.90469;
 
     public final static double movementPIDp = 1;
     public final static double movementPIDi = 0;
@@ -64,8 +65,6 @@ public class Statics {
     public final static double GYRO_D = .2;
     public final static double GYRO_F = 0;
     */
-    
-
     
     
     //public static double stickDeadzone = 0.1;  Needed?

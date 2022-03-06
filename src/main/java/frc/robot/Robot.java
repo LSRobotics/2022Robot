@@ -194,7 +194,7 @@ public class Robot extends TimedRobot {
     ballIRSensor = new AnalogInput(0);
 
     shuffleboardStartup();
-    LED.set(-0.65);
+    LED.set(-0.43);
     
     movePid = new PIDController(Statics.movementPIDp, Statics.movementPIDi, Statics.movementPidd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
     gyroPid = new PIDController(Statics.gyroPIDp, Statics.gyroPIDi, Statics.gyroPIDd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
@@ -361,7 +361,7 @@ public class Robot extends TimedRobot {
 
     climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV(), gp1.getLeftStickButtonPressed());
 
-    System.out.println(getAverageEncoderDistance());
+    //System.out.println(getAverageEncoderDistance());
     if(gp2.getLeftStickButtonPressed())
       shooterSetAngle(servoAngle);
 
@@ -520,6 +520,7 @@ public class Robot extends TimedRobot {
   public void controlShooter(boolean shoot, boolean raiseSpeed, boolean lowerSpeed){
     if(gp2.getYButton()) {
       shooter.set(shooterSpeed);
+      System.out.println(shooter.getSelectedSensorVelocity());
       if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM) {
         index.set(Statics.Index_Speed); //todo
       } else {

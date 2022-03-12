@@ -440,9 +440,9 @@ public class Robot extends TimedRobot {
       verticalClimb.set(0);
     }
     
-    if (horizontalDirection == 90){
+    if (horizontalDirection == 0){
       horizontalClimb.set(Statics.Horizontal_Climb_Speed);
-    } else if (horizontalDirection == 270){
+    } else if (horizontalDirection == 180){
       horizontalClimb.set(-Statics.Horizontal_Climb_Speed);
     } else {
       horizontalClimb.set(0);
@@ -514,7 +514,7 @@ public class Robot extends TimedRobot {
   }
   
   public boolean scanForBalls(){
-    return Math.pow(ballIRSensor.getAverageVoltage(), -1.2045) * 27.726 < 15;
+    return Math.pow(ballIRSensor.getAverageVoltage(), -1.2045) * 27.726 < 50;
   }
 
   public void controlShooter(boolean shoot, boolean raiseSpeed, boolean lowerSpeed){

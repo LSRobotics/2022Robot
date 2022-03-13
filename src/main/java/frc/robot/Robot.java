@@ -73,7 +73,7 @@ public class Robot extends TimedRobot {
   MotorControllerGroup left_motors;
   MotorControllerGroup right_motors;
   DifferentialDrive drive;
-  
+
   public CANSparkMax fl_drive;
   public CANSparkMax fr_drive;
   public CANSparkMax bl_drive;
@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
   public Servo climbRatchet;
 
   public WPI_TalonFX verticalClimb;
-  public WPI_TalonFX horizontalClimb;
+  public Spark horizontalClimb;
 
   public WPI_TalonFX shooter;
 
@@ -116,11 +116,11 @@ public class Robot extends TimedRobot {
 
   public PowerDistribution pdp;
 
-  AnalogInput ultrasonic;  
+  AnalogInput ultrasonic;
   DigitalInput bottomLimitSwitchIntake = new DigitalInput(1);
   DigitalInput topLimitSwitchIntake = new DigitalInput(0);
   Servo angleAdjuster = new Servo(4); //channel??
-  
+
   ShuffleboardTab testTab = Shuffleboard.getTab("Test Board");
   ShuffleboardTab compTab = Shuffleboard.getTab("Competition Board");
   NetworkTableEntry rightMotorNetworkTable;
@@ -145,7 +145,7 @@ public class Robot extends TimedRobot {
   //private AHRS ahrs;
 
   private enum AutonMode {
-    DRIVE, 
+    DRIVE,
     TURN,
     SHOOT,
     DEPLOYINTAKE,
@@ -171,13 +171,13 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    
+
     Camera.startCameras();
 
     initializeMotorControllers();
 
     initializeGamePad();
-    
+
 
     left_motors = new MotorControllerGroup(fl_drive, bl_drive);
     right_motors = new MotorControllerGroup(fr_drive, br_drive);
@@ -188,14 +188,14 @@ public class Robot extends TimedRobot {
     fr_drive.setOpenLoopRampRate(0.5);
     bl_drive.setOpenLoopRampRate(0.5);
     br_drive.setOpenLoopRampRate(0.5);
-    
+
     pdp = new PowerDistribution();
-    
+
     ballIRSensor = new AnalogInput(0);
 
     shuffleboardStartup();
-    LED.set(-0.65);
-    
+    LED.set(-0.43);
+
     movePid = new PIDController(Statics.movementPIDp, Statics.movementPIDi, Statics.movementPidd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
     gyroPid = new PIDController(Statics.gyroPIDp, Statics.gyroPIDi, Statics.gyroPIDd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
 
@@ -212,10 +212,10 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {   
+  public void robotPeriodic() {
     updateInputs();
     updateNetworkEntries();
-    
+
   }
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
@@ -256,7 +256,7 @@ public class Robot extends TimedRobot {
       //Auto-Generated catch block :)
       e.printStackTrace();
     }
-    
+
     autonModes = tempAutonModes.toArray(new AutonMode[0]); //TODO: check and see if you need to do `tempAutonModes.size()` instead of `0`
     autonArguments = tempAutonArguments.toArray(new String[0][0]);
 
@@ -274,15 +274,15 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     //When each step of autonomous is completed
-    
+
     if (autonConditionCompleted) {
       autonNextAction();
     }
     else {
       autonStep();
     }
-  
-    
+
+
   }
 
   /** This function is called once when teleop is enabled. */
@@ -294,14 +294,14 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    
+
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    controlIntake(gp2.getBButtonPressed(), gp1.getXButton(), gp1.getYButton());    
+    controlIntake(gp2.getBButtonPressed(), gp1.getXButton(), gp1.getYButton());
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
 
     climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV(), gp1.getLeftStickButtonPressed());
 
-    System.out.println(getAverageEncoderDistance());
+    //System.out.println(getAverageEncoderDistance());
     if(gp2.getLeftStickButtonPressed())
       shooterSetAngle(servoAngle);
 
@@ -331,23 +331,23 @@ public class Robot extends TimedRobot {
     gp2 = new XboxController(Statics.XboxController2_ID);
   }
 
-  private void initializeMotorControllers() {   
-   
+  private void initializeMotorControllers() {
+
     shooter = new WPI_TalonFX(Statics.Shooter_Motor_ID);
     intake = new Spark(Statics.Intake_Motor_ID);
     index = new Spark(Statics.Index_Motor_ID);
     intakeUpDown = new Spark(Statics.Intake_Up_Down_Motor_ID);
     LED = new Spark(Statics.ledControllerID);
-    
+
     fl_drive = new CANSparkMax(Statics.Front_Left_Motor_ID, MotorType.kBrushless);
     fr_drive = new CANSparkMax(Statics.Front_Right_Motor_ID, MotorType.kBrushless);
     bl_drive = new CANSparkMax(Statics.Back_Left_Motor_ID, MotorType.kBrushless);
     br_drive = new CANSparkMax(Statics.Back_Right_Motor_ID, MotorType.kBrushless);
 
     verticalClimb = new WPI_TalonFX(Statics.Vertical_Climb_Motor_ID);
-    horizontalClimb = new WPI_TalonFX(Statics.Horizontal_Climb_Motor_ID);
+    horizontalClimb = new Spark(Statics.Horizontal_Climb_Motor_ID);
     climbRatchet = new Servo(Statics.Climb_Ratchet_ID);
-    
+
   }
 
   private void driveTrain(double power, double turn) {
@@ -380,17 +380,17 @@ public class Robot extends TimedRobot {
       verticalClimb.set(0);
     }
 
-    if (horizontalDirection == 90){
+    if (horizontalDirection == 0){
       horizontalClimb.set(Statics.Horizontal_Climb_Speed);
-    } else if (horizontalDirection == 270){
+    } else if (horizontalDirection == 180){
       horizontalClimb.set(-Statics.Horizontal_Climb_Speed);
     } else {
       horizontalClimb.set(0);
     }
 
     if (ratchetButton && climbRatchet.get() == 0){
-      climbRatchet.set(0.25);
-    } else if (ratchetButton && climbRatchet.get() == 0.25){
+      climbRatchet.set(1);
+    } else if (ratchetButton && climbRatchet.get() == 1){
       climbRatchet.set(0);
     }
 
@@ -409,7 +409,7 @@ public class Robot extends TimedRobot {
       ratchetEngaged.setBoolean(true);
     else
       ratchetEngaged.setBoolean(false);
-    
+
     //navXEntry.setDouble(navXAngle)
   }
   public void updateInputs(){
@@ -424,7 +424,7 @@ public class Robot extends TimedRobot {
 
     //shooterRPM = 0;
     shooter.getSelectedSensorVelocity();
-    
+
     //navXAngle = navX.getAngle();
   }
 
@@ -436,30 +436,32 @@ public class Robot extends TimedRobot {
         intake.set(Statics.Intake_Speed);
       else if (reverseIntake)
         intake.set(-Statics.Intake_Speed);
-      else 
+      else
         intake.set(0);
     //}
 
-    if (!goingUp){
-      if (!bottomLimitSwitchIntake.get() && moveIntake) {
-        intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
-        goingUp = true;
-    } 
-  } else if (!topLimitSwitchIntake.get() && moveIntake){
-      intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-      goingUp = false;
+    if (moveIntake && goingUp) {
+      if (topLimitSwitchIntake.get()){
+        intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
+        goingUp = false;
+      }
+    }else if (moveIntake && !goingUp) {
+        if (bottomLimitSwitchIntake.get()) {
+          intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
+          goingUp = true;
+        }
+    }else
+      intakeUpDown.set(0);
   }
-    else
-      intakeUpDown.set(0);  
-  }
-  
+
   public boolean scanForBalls(){
-    return Math.pow(ballIRSensor.getAverageVoltage(), -1.2045) * 27.726 < 15;
+    return Math.pow(ballIRSensor.getAverageVoltage(), -1.2045) * 27.726 < 50;
   }
 
   public void controlShooter(boolean shoot, boolean raiseSpeed, boolean lowerSpeed){
     if(gp2.getYButton()) {
       shooter.set(shooterSpeed);
+      System.out.println(shooter.getSelectedSensorVelocity());
       if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM) {
         index.set(Statics.Index_Speed); //todo
       } else {
@@ -469,17 +471,17 @@ public class Robot extends TimedRobot {
       shooter.set(0);
       index.set(0);
     }
-    
+
     if (raiseSpeed){
       shooterSpeed += 0.05;
     }
     if (lowerSpeed){
       shooterSpeed -= 0.05;
-    }    
+    }
   }
   //needs specific angles
   public void shooterSetAngle(double previousAngle){
-    
+
     if (previousAngle == 0) {
       angleAdjuster.setAngle(45);
       servoAngle = 45;
@@ -498,7 +500,7 @@ public class Robot extends TimedRobot {
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)
     .withPosition(0, 0)
-    .getEntry();   
+    .getEntry();
 
     leftMotorNetworkTable  = testTab.add("Left Motor Value", 1)
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
@@ -516,7 +518,7 @@ public class Robot extends TimedRobot {
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize( 1, 1)
     .withPosition(4 , 0);
-    
+
     testTab.add("camera dos", Camera.cam1)
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize(1,1)
@@ -527,7 +529,7 @@ public class Robot extends TimedRobot {
     .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)
     .withPosition(0, 0)
-    .getEntry();   
+    .getEntry();
 
     leftMotorNetworkTable  = compTab.add("Left Motor Value", 1)
     .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", -1, "max", 1))
@@ -592,7 +594,7 @@ public class Robot extends TimedRobot {
     .withPosition(3, 3);
 
     OR (Need to check both)
-    
+
     navXEntry = compTab.add("navX Angle", 0)
     .withWidget(BuiltInWidgets.kGyro)
     .withSize(1,1)
@@ -653,7 +655,7 @@ public class Robot extends TimedRobot {
   public void autonNextAction() {
     autoIncrement++;
 
-    
+
     // AUTO INCREMENT [PLACE AUTON INSTRUCTIONS HERE]
     // - each switch case is another instruction
     // - currently it is a switch statement and not an array to allow for some alternative functions to be called other than `set auton`
@@ -696,11 +698,11 @@ public class Robot extends TimedRobot {
       // DRIVE MODE
       // - Drives forward some distance in **INSERT**UNITS**HERE**
       // - Uses the ahrs in order to ensure the robot drives straight
-      case DRIVE: 
+      case DRIVE:
 
         //double error = ahrs.getAngle();
         //double turn = error;
-        
+
         double valueToCalculate = (getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters;
         //System.out.println(movePid.getSetpoint());
         double rawValue = movePid.calculate(valueToCalculate);
@@ -710,12 +712,12 @@ public class Robot extends TimedRobot {
           autonConditionCompleted = true;
         }
         break;
-      // TURN MODE 
+      // TURN MODE
       // - Turns some distance in degrees
-      case TURN: 
+      case TURN:
         //double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
         //drive.arcadeDrive(0,currentRotationRate);
-        
+
         if (gyroPid.atSetpoint()) {
           autonConditionCompleted = true;
         }
@@ -742,5 +744,5 @@ public class Robot extends TimedRobot {
         break;
     }
   }
-  
+
 }

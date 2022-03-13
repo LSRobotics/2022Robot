@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 //import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
@@ -36,8 +37,8 @@ import edu.wpi.first.math.controller.PIDController;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 
-//import com.kauailabs.navx.frc.AHRS;
-//import edu.wpi.first.wpilibj.SPI; //TODO: change the port system depending on what we actually use
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI; //TODO: change the port system depending on what we actually use
 
 import java.awt.Desktop;
 import java.io.*;
@@ -142,7 +143,7 @@ public class Robot extends TimedRobot {
 
   private int autoIncrement;
 
-  //private AHRS ahrs;
+  private AHRS ahrs;
 
   private enum AutonMode {
     DRIVE,
@@ -166,6 +167,9 @@ public class Robot extends TimedRobot {
   private double autonStartingPos;
 
   private boolean autonIntake = false;
+
+  private Timer autonTimer;
+  private double autonTimeFinish = 0.0;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -201,7 +205,7 @@ public class Robot extends TimedRobot {
     movePid = new PIDController(Statics.movementPIDp, Statics.movementPIDi, Statics.movementPidd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
     gyroPid = new PIDController(Statics.gyroPIDp, Statics.gyroPIDi, Statics.gyroPIDd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
 
-    //ahrs = new AHRS(SPI.Port.kMXP);
+    ahrs = new AHRS(SPI.Port.kMXP);
 
 
   }
@@ -233,6 +237,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     autoIncrement = -1;
     autonConditionCompleted = true;
+    autonTimer = new Timer();
     currentAuton = AutonMode.NONE;
     ArrayList<AutonMode> tempAutonModes = new ArrayList<AutonMode>();
     ArrayList<String[]> tempAutonArguments = new ArrayList<String[]>();
@@ -432,7 +437,7 @@ public class Robot extends TimedRobot {
   }
 
   //If button is pressed move until limit switch
-  public void controlIntakeUppeyDowney(boolean butt){
+  public int controlIntakeUppeyDowney(boolean butt){
     intakeUpDown.set(upDown);
     if (bottomLimitSwitchIntake.get() && butt) {
       upDown = -1;
@@ -440,9 +445,12 @@ public class Robot extends TimedRobot {
       upDown = 1;
     } else if (bottomLimitSwitchIntake.get() && upDown == 1){
       upDown = 0;
+      return 1; 
     } else if (topLimitSwitchIntake.get() && upDown == -1){
       upDown = 0;
+      return -1;
     }
+    return 0;
   }
   public void controlIntake(boolean moveIntake, boolean reverseIntake){
       if (moveIntake)
@@ -613,7 +621,7 @@ public class Robot extends TimedRobot {
         System.out.println("Starting position"+ autonStartingPos);
         break;
       case TURN:
-        //ahrs.reset();
+        ahrs.reset();
         gyroPid.setSetpoint(Double.parseDouble(targetValue[0]));
         break;
       case SHOOT:
@@ -621,7 +629,7 @@ public class Robot extends TimedRobot {
         break;
       case DEPLOYINTAKE:
         //deploy the intake by applying speed to the motor
-
+        controlIntakeUppeyDowney(true);
         break;
       case INTAKEON:
         autonIntake = true;
@@ -634,6 +642,9 @@ public class Robot extends TimedRobot {
       case WAIT:
         //start a timer
         //auton condition completed when timer reaches desired time
+        autonTimer.reset();
+        autonTimer.start();
+        autonTimeFinish = Double.parseDouble(targetValue[0]);
         break;
       case NONE:
       default:
@@ -715,8 +726,8 @@ public class Robot extends TimedRobot {
       // TURN MODE
       // - Turns some distance in degrees
       case TURN:
-        //double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
-        //drive.arcadeDrive(0,currentRotationRate);
+        double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
+        drive.arcadeDrive(0,currentRotationRate);
 
         if (gyroPid.atSetpoint()) {
           autonConditionCompleted = true;
@@ -737,11 +748,17 @@ public class Robot extends TimedRobot {
       // - Lowers the intake
       // - Condition is completed when the intake reaches the limit switch
       case DEPLOYINTAKE:
+        if (controlIntakeUppeyDowney(false) == -1) {
+          autonConditionCompleted = true;
+        } 
         break;
       // WAIT MODE
       // - Waits a certain amount of time
       // - Condition completed when the specified time is reached
       case WAIT:
+        if (autonTimer.get() >= autonTimeFinish) {
+          autonConditionCompleted = true;
+        }
         break;
       case NONE:
       default:

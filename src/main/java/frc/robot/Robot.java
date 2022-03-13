@@ -165,6 +165,8 @@ public class Robot extends TimedRobot {
 
   private double autonStartingPos;
 
+  private boolean autonIntake = false;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -459,7 +461,7 @@ public class Robot extends TimedRobot {
   }
 
   public void controlShooter(boolean shoot, boolean raiseSpeed, boolean lowerSpeed){
-    if(gp2.getYButton()) {
+    if(shoot) {
       shooter.set(shooterSpeed);
       System.out.println(shooter.getSelectedSensorVelocity());
       if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM) {
@@ -622,13 +624,14 @@ public class Robot extends TimedRobot {
         break;
       case DEPLOYINTAKE:
         //deploy the intake by applying speed to the motor
+        
         break;
       case INTAKEON:
-
+        autonIntake = true;
         autonConditionCompleted = true;
         break;
       case INTAKEOFF:
-
+        autonIntake = false;
         autonConditionCompleted = true;
         break;
       case WAIT:
@@ -727,6 +730,11 @@ public class Robot extends TimedRobot {
       // - Spins the indexer motor when motor reaches RPM
       // - Condition is completed when the IR sensor indicated no balls are present
       case SHOOT:
+        if (scanForBalls()) {
+          controlShooter(true, false, false);
+          return;
+        }
+        autonConditionCompleted = true;
         break;
       // DEPLOY INTAKE MODE
       // - Lowers the intake

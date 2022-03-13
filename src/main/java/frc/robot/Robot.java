@@ -355,7 +355,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     
-    driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());  
+    driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
+    controlIntake()  
     controlIntakeUppeyDowney(gp2.getBButtonPressed()); 
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());    
 
@@ -500,6 +501,14 @@ public class Robot extends TimedRobot {
     } else if (topLimitSwitchIntake.get() && upDown == -1){
       upDown = 0;
     } 
+  }
+  public void controlIntake(boolean moveIntake, boolean reverseIntake){
+      if (moveIntake)
+        intake.set(Statics.Intake_Speed);
+      else if (reverseIntake)
+        intake.set(-Statics.Intake_Speed);
+      else 
+        intake.set(0);
   }
   
   public boolean scanForBalls(){

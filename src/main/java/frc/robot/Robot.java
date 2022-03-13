@@ -111,7 +111,7 @@ public class Robot extends TimedRobot {
 
   double speed;
 
-  boolean goingUp = false;
+  int upDown = 0;
   double servoAngle = 0;
 
   public PowerDistribution pdp;
@@ -355,9 +355,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     
-    driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    controlIntake(gp2.getBButtonPressed(), gp1.getXButton(), gp1.getYButton());    
-    controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
+    driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());  
+    controlIntakeUppeyDowney(gp2.getBButtonPressed()); 
+    controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());    
 
     climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV(), gp1.getLeftStickButtonPressed());
 
@@ -489,28 +489,17 @@ public class Robot extends TimedRobot {
   }
 
   //If button is pressed move until limit switch
-  public void controlIntake(boolean moveIntake, boolean reverseIntake, boolean testIntake){
-        //now runs backward with x and forwards with Y
-    //if (!bottomLimitSwitchIntake.get()){
-      if (testIntake)
-        intake.set(Statics.Intake_Speed);
-      else if (reverseIntake)
-        intake.set(-Statics.Intake_Speed);
-      else 
-        intake.set(0);
-    //}
-
-    if (!goingUp){
-      if (!bottomLimitSwitchIntake.get() && moveIntake) {
-        intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
-        goingUp = true;
+  public void controlIntakeUppeyDowney(boolean butt){
+    intakeUpDown.set(upDown);
+    if (bottomLimitSwitchIntake.get() && butt) {
+      upDown = -1;
+    } else if (butt){
+      upDown = 1;
+    } else if (bottomLimitSwitchIntake.get() && upDown == 1){
+      upDown = 0;
+    } else if (topLimitSwitchIntake.get() && upDown == -1){
+      upDown = 0;
     } 
-  } else if (!topLimitSwitchIntake.get() && moveIntake){
-      intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-      goingUp = false;
-  }
-    else
-      intakeUpDown.set(0);  
   }
   
   public boolean scanForBalls(){
@@ -518,7 +507,7 @@ public class Robot extends TimedRobot {
   }
 
   public void controlShooter(boolean shoot, boolean raiseSpeed, boolean lowerSpeed){
-    if(gp2.getYButton()) {
+    if(shoot) {
       shooter.set(shooterSpeed);
       System.out.println(shooter.getSelectedSensorVelocity());
       if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM) {

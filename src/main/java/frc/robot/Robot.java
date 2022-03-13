@@ -358,12 +358,12 @@ public class Robot extends TimedRobot {
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
     controlIntake(gp1.getYButton(), gp1.getXButton());  
     controlIntakeUppeyDowney(gp2.getBButtonPressed()); 
-    controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());    
+    controlShooter(gp2.getXButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());    
 
-    climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV(), gp1.getLeftStickButtonPressed());
+    climb(gp2.getYButton(), gp2.getAButton(), gp2.getPOV(), gp2.getLeftStickButtonPressed());
 
     //System.out.println(getAverageEncoderDistance());
-    if(gp2.getLeftStickButtonPressed())
+    if(gp2.getRightStickButtonPressed())
       shooterSetAngle(servoAngle);
 
     if(gp2.getStartButtonPressed())

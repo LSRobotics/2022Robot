@@ -500,16 +500,17 @@ public class Robot extends TimedRobot {
         intake.set(0);
     //}
 
-    if (!goingUp){
-      if (!bottomLimitSwitchIntake.get() && moveIntake) {
-        intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
-        goingUp = true;
-    } 
-  } else if (!topLimitSwitchIntake.get() && moveIntake){
-      intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-      goingUp = false;
-  }
-    else
+    if (moveIntake && goingUp) {
+      if (topLimitSwitchIntake.get()){
+        intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
+        goingUp = false;
+      }
+    }else if (moveIntake && !goingUp) {
+        if (bottomLimitSwitchIntake.get()) {
+          intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
+          goingUp = true;
+        } 
+    }else
       intakeUpDown.set(0);  
   }
   

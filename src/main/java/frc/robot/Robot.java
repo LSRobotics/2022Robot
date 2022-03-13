@@ -111,7 +111,7 @@ public class Robot extends TimedRobot {
 
   double speed;
 
-  boolean goingUp = false;
+  int upDown = 0;
   double servoAngle = 0;
 
   public PowerDistribution pdp;
@@ -298,7 +298,8 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
 
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    controlIntake(gp2.getBButtonPressed(), gp1.getXButton(), gp1.getYButton());
+    controlIntake(gp1.getYButton(), gp1.getXButton());
+    controlIntakeUppeyDowney(gp2.getBButtonPressed());
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
 
     climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV(), gp1.getLeftStickButtonPressed());
@@ -431,29 +432,25 @@ public class Robot extends TimedRobot {
   }
 
   //If button is pressed move until limit switch
-  public void controlIntake(boolean moveIntake, boolean reverseIntake, boolean testIntake){
-        //now runs backward with x and forwards with Y
-    //if (!bottomLimitSwitchIntake.get()){
-      if (testIntake)
+  public void controlIntakeUppeyDowney(boolean butt){
+    intakeUpDown.set(upDown);
+    if (bottomLimitSwitchIntake.get() && butt) {
+      upDown = -1;
+    } else if (butt){
+      upDown = 1;
+    } else if (bottomLimitSwitchIntake.get() && upDown == 1){
+      upDown = 0;
+    } else if (topLimitSwitchIntake.get() && upDown == -1){
+      upDown = 0;
+    }
+  }
+  public void controlIntake(boolean moveIntake, boolean reverseIntake){
+      if (moveIntake)
         intake.set(Statics.Intake_Speed);
       else if (reverseIntake)
         intake.set(-Statics.Intake_Speed);
       else
         intake.set(0);
-    //}
-
-    if (moveIntake && goingUp) {
-      if (topLimitSwitchIntake.get()){
-        intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-        goingUp = false;
-      }
-    }else if (moveIntake && !goingUp) {
-        if (bottomLimitSwitchIntake.get()) {
-          intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
-          goingUp = true;
-        }
-    }else
-      intakeUpDown.set(0);
   }
 
   public boolean scanForBalls(){
@@ -624,7 +621,7 @@ public class Robot extends TimedRobot {
         break;
       case DEPLOYINTAKE:
         //deploy the intake by applying speed to the motor
-        
+
         break;
       case INTAKEON:
         autonIntake = true;

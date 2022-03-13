@@ -356,7 +356,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    controlIntake()  
+    controlIntake(gp1.getYButton(), gp1.getXButton());  
     controlIntakeUppeyDowney(gp2.getBButtonPressed()); 
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());    
 

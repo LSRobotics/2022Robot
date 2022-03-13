@@ -10,11 +10,9 @@ An FRC Robot for the 2022 FIRST Robotics Season
 
 Moving - Arcade Drive - Cubic scaled deadband using left Y-axis and right X-axis
 
-Move Intake - B Button
+Move Intake - Y Button
 
 Reverse Intake - X Button
-
-Intake In - Y Button
 
 Climb Ratchet - Left Stick Button
 

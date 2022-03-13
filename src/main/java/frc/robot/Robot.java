@@ -236,7 +236,7 @@ public class Robot extends TimedRobot {
     ArrayList<String[]> tempAutonArguments = new ArrayList<String[]>();
 
     //Spaghetti code:
-    File autonInstructionFile = new File(Filesystem.getDeployDirectory().getPath() + "/autonInstructions.txt");
+    File autonInstructionFile = new File(Filesystem.getDeployDirectory().getPath() + "/autonInstructions.adil");
     try (Scanner input = new Scanner(autonInstructionFile)) {
       while (input.hasNext()) {
         String line = input.nextLine();
@@ -247,7 +247,6 @@ public class Robot extends TimedRobot {
         for (String x : lineInput.tokens().collect(Collectors.toList())) {
           tempLineArgs.add(x);
         }
-        System.out.println("QQQQ");
         tempAutonArguments.add(tempLineArgs.toArray(new String[0]));
         System.out.println(lineInput.tokens().toArray());
         lineInput.close();
@@ -260,6 +259,16 @@ public class Robot extends TimedRobot {
     
     autonModes = tempAutonModes.toArray(new AutonMode[0]); //TODO: check and see if you need to do `tempAutonModes.size()` instead of `0`
     autonArguments = tempAutonArguments.toArray(new String[0][0]);
+
+    //CODE TO DEBUG THE PARSER
+    //for (int i = 0; i < autonModes.length; i++) {
+    // System.out.print(autonModes[i] + ": ");
+    // for (String argument : autonArguments[i]) {
+    // System.out.print(argument + ",[]");
+    // }
+    //
+    // System.out.println();
+    //}
   }
   /** This function is called periodically during autonomous. */
   @Override
@@ -267,80 +276,12 @@ public class Robot extends TimedRobot {
     //When each step of autonomous is completed
     
     if (autonConditionCompleted) {
-      autoIncrement++;
-
-    
-      // AUTO INCREMENT [PLACE AUTON INSTRUCTIONS HERE]
-      // - each switch case is another instruction
-      // - currently it is a switch statement and not an array to allow for some alternative functions to be called other than `set auton`
-      // - SetAuton(AutonMode, targetValue) is the main function being used currently.
-      // - Current AutonModes are `DRIVE` and `TURN`, with `NONE` being just to do nothing
-      // - the targetValue is the value whatever the specific AutonMode is measuring should reach
-
-      setAuton(autonModes[autoIncrement], autonArguments[autoIncrement]);
-      System.out.println(autonModes[autoIncrement].toString());
-      System.out.println(autonArguments[autoIncrement].toString());
-      //auton 1
-        //starting position: directly under hub
-        //wait a variable amount of seconds (allow it to be changed in dashboard)
-        //shoot the ball directly into the low goal
-        //turn to face position 1 (see plans)
-        //move away (to get out of the way of others)
-      //auton 2
-        //starting position: directly under hub
-        //wait a variable amount of seconds (allow it to be changed in dashboard)
-        //shoot the ball directly into the low goal
-        //turn to face position 1 (see plans)
-        //move away (to get out of the way of others)
-        //drop intake
-        //pick up ball (predetermined position)
-        //turn to aim back at goal
-        //shoot the ball into either low or high
-      //auton 3
-        //drop intake
-        //move to pick up cargo
-        //turn to aim at goal
-        //move into position
-        //score goal
-      autonConditionCompleted = false;
-      System.out.println("Started Next Auton Instruction");
-      drive.arcadeDrive(0,0);
+      autonNextAction();
     }
     else {
-      switch (currentAuton) {
-        // DRIVE MODE
-        // - Drives forward some distance in **INSERT**UNITS**HERE**
-        // - Uses the ahrs in order to ensure the robot drives straight
-        case DRIVE: 
-
-          //double error = ahrs.getAngle();
-          //double turn = error;
-          
-          double valueToCalculate = (getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters;
-          //System.out.println(movePid.getSetpoint());
-          double rawValue = movePid.calculate(valueToCalculate);
-          double driveValue = MathUtil.clamp(rawValue, -1, 1);
-          drive.arcadeDrive(Statics.Drive_Speed*driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
-          if (movePid.atSetpoint()) {
-            autonConditionCompleted = true;
-          }
-          break;
-        // TURN MODE 
-        // - Turns some distance in degrees
-        case TURN: 
-          //double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
-          //drive.arcadeDrive(0,currentRotationRate);
-          
-          if (gyroPid.atSetpoint()) {
-            autonConditionCompleted = true;
-          }
-          break;
-        case NONE:
-        default:
-          drive.arcadeDrive(0,0);
-          break;
-      }
+      autonStep();
     }
+  
     
   }
 
@@ -707,6 +648,99 @@ public class Robot extends TimedRobot {
   */
   private double getAverageEncoderDistance() {
     return (fl_drive.getEncoder().getPosition() + fr_drive.getEncoder().getPosition() + bl_drive.getEncoder().getPosition() + br_drive.getEncoder().getPosition())/4;
+  }
+
+  public void autonNextAction() {
+    autoIncrement++;
+
+    
+    // AUTO INCREMENT [PLACE AUTON INSTRUCTIONS HERE]
+    // - each switch case is another instruction
+    // - currently it is a switch statement and not an array to allow for some alternative functions to be called other than `set auton`
+    // - SetAuton(AutonMode, targetValue) is the main function being used currently.
+    // - Current AutonModes are `DRIVE` and `TURN`, with `NONE` being just to do nothing
+    // - the targetValue is the value whatever the specific AutonMode is measuring should reach
+
+    setAuton(autonModes[autoIncrement], autonArguments[autoIncrement]);
+    System.out.println(autonModes[autoIncrement].toString());
+    System.out.println(autonArguments[autoIncrement].toString());
+    //auton 1
+      //starting position: directly under hub
+      //wait a variable amount of seconds (allow it to be changed in dashboard)
+      //shoot the ball directly into the low goal
+      //turn to face position 1 (see plans)
+      //move away (to get out of the way of others)
+    //auton 2
+      //starting position: directly under hub
+      //wait a variable amount of seconds (allow it to be changed in dashboard)
+      //shoot the ball directly into the low goal
+      //turn to face position 1 (see plans)
+      //move away (to get out of the way of others)
+      //drop intake
+      //pick up ball (predetermined position)
+      //turn to aim back at goal
+      //shoot the ball into either low or high
+    //auton 3
+      //drop intake
+      //move to pick up cargo
+      //turn to aim at goal
+      //move into position
+      //score goal
+    autonConditionCompleted = false;
+    System.out.println("Started Next Auton Instruction");
+    drive.arcadeDrive(0,0);
+  }
+
+  public void autonStep() {
+    switch (currentAuton) {
+      // DRIVE MODE
+      // - Drives forward some distance in **INSERT**UNITS**HERE**
+      // - Uses the ahrs in order to ensure the robot drives straight
+      case DRIVE: 
+
+        //double error = ahrs.getAngle();
+        //double turn = error;
+        
+        double valueToCalculate = (getAverageEncoderDistance()-autonStartingPos)/Statics.SensorToMeters;
+        //System.out.println(movePid.getSetpoint());
+        double rawValue = movePid.calculate(valueToCalculate);
+        double driveValue = MathUtil.clamp(rawValue, -1, 1);
+        drive.arcadeDrive(Statics.Drive_Speed*driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
+        if (movePid.atSetpoint()) {
+          autonConditionCompleted = true;
+        }
+        break;
+      // TURN MODE 
+      // - Turns some distance in degrees
+      case TURN: 
+        //double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
+        //drive.arcadeDrive(0,currentRotationRate);
+        
+        if (gyroPid.atSetpoint()) {
+          autonConditionCompleted = true;
+        }
+        break;
+      // SHOOT MODE
+      // - Revs the motor until it gets to the target RPM
+      // - Spins the indexer motor when motor reaches RPM
+      // - Condition is completed when the IR sensor indicated no balls are present
+      case SHOOT:
+        break;
+      // DEPLOY INTAKE MODE
+      // - Lowers the intake
+      // - Condition is completed when the intake reaches the limit switch
+      case DEPLOYINTAKE:
+        break;
+      // WAIT MODE
+      // - Waits a certain amount of time
+      // - Condition completed when the specified time is reached
+      case WAIT:
+        break;
+      case NONE:
+      default:
+        drive.arcadeDrive(0,0);
+        break;
+    }
   }
   
 }

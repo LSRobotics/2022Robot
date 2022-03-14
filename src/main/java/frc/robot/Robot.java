@@ -500,24 +500,24 @@ public class Robot extends TimedRobot {
         intake.set(0);
     //}
       if(downIntake){
-        //if(!bottomLimitSwitchIntake.get()){
-          //intakeUpDown.set(0);
-        //}
-       // else{
+        if(!bottomLimitSwitchIntake.get()){
+          intakeUpDown.set(0);
+        }
+        else{
           intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
          
-       // }
+        }
       }
       else if(moveIntake){
-        /*if(!topLimitSwitchIntake.get()){
+        if(!topLimitSwitchIntake.get()){
           intakeUpDown.set(0);
           
         }
-        else{ */
+        else{ 
           intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
-          //System.out.println(topLimitSwitchIntake.get());
-          //System.out.println(intakeUpDown.get());
-        //}
+          System.out.println(topLimitSwitchIntake.get());
+          System.out.println(intakeUpDown.get());
+        }
       }
       else{
         intakeUpDown.set(0);

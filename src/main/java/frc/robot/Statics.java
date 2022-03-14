@@ -36,7 +36,7 @@ public class Statics {
     public final static int Shooter_Motor_ID = 5;
     public final static int Index_Motor_ID = 0;
     public final static int Intake_Motor_ID = 2; 
-    public final static int Intake_Up_Down_Motor_ID = 1;
+    public final static int Intake_Up_Down_Motor_ID = 7;
     public final static int ledControllerID = 6;
 
 

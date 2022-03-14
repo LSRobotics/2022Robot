@@ -117,8 +117,8 @@ public class Robot extends TimedRobot {
   public PowerDistribution pdp;
 
   AnalogInput ultrasonic;  
-  DigitalInput bottomLimitSwitchIntake = new DigitalInput(1);
-  DigitalInput topLimitSwitchIntake = new DigitalInput(0);
+  DigitalInput bottomLimitSwitchIntake = new DigitalInput(2);
+  DigitalInput topLimitSwitchIntake = new DigitalInput(3);
   Servo angleAdjuster = new Servo(4); //channel??
   
   ShuffleboardTab testTab = Shuffleboard.getTab("Test Board");
@@ -356,7 +356,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    controlIntake(gp2.getBButtonPressed(), gp1.getXButton(), gp1.getYButton());    
+    controlIntake(gp2.getBButton(), gp1.getXButton(), gp1.getYButton(), gp2.getAButton());    
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
 
     climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV(), gp1.getLeftStickButtonPressed());
@@ -489,7 +489,7 @@ public class Robot extends TimedRobot {
   }
 
   //If button is pressed move until limit switch
-  public void controlIntake(boolean moveIntake, boolean reverseIntake, boolean testIntake){
+  public void controlIntake(boolean moveIntake, boolean reverseIntake, boolean testIntake, boolean downIntake){
         //now runs backward with x and forwards with Y
     //if (!bottomLimitSwitchIntake.get()){
       if (testIntake)
@@ -499,18 +499,41 @@ public class Robot extends TimedRobot {
       else 
         intake.set(0);
     //}
-
-    if (!goingUp){
+      if(downIntake){
+        //if(!bottomLimitSwitchIntake.get()){
+          //intakeUpDown.set(0);
+        //}
+       // else{
+          intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
+         
+       // }
+      }
+      else if(moveIntake){
+        /*if(!topLimitSwitchIntake.get()){
+          intakeUpDown.set(0);
+          
+        }
+        else{ */
+          intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
+          //System.out.println(topLimitSwitchIntake.get());
+          //System.out.println(intakeUpDown.get());
+        //}
+      }
+      else{
+        intakeUpDown.set(0);
+      }
+  /*  if (!goingUp){
       if (!bottomLimitSwitchIntake.get() && moveIntake) {
         intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
         goingUp = true;
     } 
-  } else if (!topLimitSwitchIntake.get() && moveIntake){
+  } else if (topLimitSwitchIntake.get() && moveIntake){
       intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
       goingUp = false;
   }
     else
-      intakeUpDown.set(0);  
+      intakeUpDown.set(0);
+      */  
   }
   
   public boolean scanForBalls(){

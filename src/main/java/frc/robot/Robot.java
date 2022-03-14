@@ -111,7 +111,7 @@ public class Robot extends TimedRobot {
 
   double speed;
 
-  boolean goingUp = false;
+  int upDown = 0;
   double servoAngle = 0;
 
   public PowerDistribution pdp;
@@ -359,10 +359,10 @@ public class Robot extends TimedRobot {
     controlIntake(gp2.getBButton(), gp1.getXButton(), gp1.getYButton(), gp2.getAButton());    
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
 
-    climb(gp1.getRightBumper(), gp1.getLeftBumper(), gp1.getPOV(), gp1.getLeftStickButtonPressed());
+    climb(gp2.getYButton(), gp2.getAButton(), gp2.getPOV(), gp2.getLeftStickButtonPressed());
 
     //System.out.println(getAverageEncoderDistance());
-    if(gp2.getLeftStickButtonPressed())
+    if(gp2.getRightStickButtonPressed())
       shooterSetAngle(servoAngle);
 
     if(gp2.getStartButtonPressed())
@@ -541,7 +541,7 @@ public class Robot extends TimedRobot {
   }
 
   public void controlShooter(boolean shoot, boolean raiseSpeed, boolean lowerSpeed){
-    if(gp2.getYButton()) {
+    if(shoot) {
       shooter.set(shooterSpeed);
       System.out.println(shooter.getSelectedSensorVelocity());
       if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM) {

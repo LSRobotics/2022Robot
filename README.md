@@ -20,7 +20,7 @@ Increase Shooter Speed - Right Bumper
 
 Decrease Shooter Speed - Left Bumper
 
-Start Shooter & Automated Index - X Button
+Start Shooter & Automated Index - Right Trigger Button
 
 Change Camera - Start Button
 

@@ -111,7 +111,7 @@ public class Robot extends TimedRobot {
 
   double shooterSpeed = Statics.Shooter_Speed;
 
-  double speed;
+  double autonSpeedScalar;
 
   int upDown = 0;
   double servoAngle = 0;
@@ -153,6 +153,8 @@ public class Robot extends TimedRobot {
     DEPLOYINTAKE,
     INTAKEON,
     INTAKEOFF,
+    SETSHOOTERSPEED,
+    SETSPEED,
     WAIT,
     NONE
   }
@@ -171,6 +173,9 @@ public class Robot extends TimedRobot {
 
   private Timer autonTimer;
   private double autonTimeFinish = 0.0;
+
+  private double autonDriveBuffer = 0;
+  private double autonTurnBuffer = 0;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -241,6 +246,7 @@ public class Robot extends TimedRobot {
     autoIncrement = -1;
     autonConditionCompleted = true;
     autonTimer = new Timer();
+    autonSpeedScalar = 1;
     currentAuton = AutonMode.NONE;
     ArrayList<AutonMode> tempAutonModes = new ArrayList<AutonMode>();
     ArrayList<String[]> tempAutonArguments = new ArrayList<String[]>();
@@ -292,6 +298,7 @@ public class Robot extends TimedRobot {
       autonStep();
     }
 
+    drive.arcadeDrive(autonDriveBuffer, autonTurnBuffer);
 
   }
 
@@ -306,7 +313,8 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
 
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    controlIntake(gp2.getBButton(), gp1.getXButton(), gp1.getYButton(), gp2.getXButton());    
+    controlIntake(gp1.getYButton(), gp1.getXButton());    
+    controlIntakeUppeyDowney(gp2.getBButton(), gp2.getXButton());
     controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
 
     climb(gp2.getYButton(), gp2.getAButton(), gp2.getPOV(), gp2.getLeftStickButtonPressed());
@@ -439,51 +447,29 @@ public class Robot extends TimedRobot {
   }
 
   //If button is pressed move until limit switch
-  public void controlIntake(boolean moveIntake, boolean reverseIntake, boolean testIntake, boolean downIntake){
+  public void controlIntake(boolean moveIntake, boolean reverseIntake){
         //now runs backward with x and forwards with Y
     //if (!bottomLimitSwitchIntake.get()){
-      if (testIntake)
+      if (moveIntake)
         intake.set(Statics.Intake_Speed);
       else if (reverseIntake)
         intake.set(-Statics.Intake_Speed);
       else
         intake.set(0);
     //}
-      if(downIntake){
-        if(!bottomLimitSwitchIntake.get()){
-          intakeUpDown.set(0);
-        }
-        else{
-          intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-         
-        }
-      }
-      else if(moveIntake){
-        if(!topLimitSwitchIntake.get()){
-          intakeUpDown.set(0);
-          
-        }
-        else{ 
-          intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
-          System.out.println(topLimitSwitchIntake.get());
-          System.out.println(intakeUpDown.get());
-        }
-      }
-      else{
-        intakeUpDown.set(0);
-      }
-  /*  if (!goingUp){
-      if (!bottomLimitSwitchIntake.get() && moveIntake) {
-        intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
-        goingUp = true;
-    } 
-  } else if (topLimitSwitchIntake.get() && moveIntake){
-      intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-      goingUp = false;
   }
-    else
+
+  public void controlIntakeUppeyDowney(boolean upIntake, boolean downIntake) {
+
+    if(downIntake && !bottomLimitSwitchIntake.get()){
+      intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
+    }
+    else if(upIntake && !topLimitSwitchIntake.get()) {
+      intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
+    }
+    else{
       intakeUpDown.set(0);
-      */  
+    }
   }
 
   public boolean scanForBalls(){
@@ -636,7 +622,7 @@ public class Robot extends TimedRobot {
 
   private void setAuton(AutonMode mode, String[] targetValue) {
     currentAuton = mode;
-    autonTarget = Double.parseDouble(targetValue[0]);
+    autonSetDrive(0,0);
 
     switch (mode) {
       case DRIVE:
@@ -654,7 +640,7 @@ public class Robot extends TimedRobot {
         break;
       case DEPLOYINTAKE:
         //deploy the intake by applying speed to the motor
-        controlIntakeUppeyDowney(true);
+        controlIntakeUppeyDowney(false, true);
         break;
       case INTAKEON:
         autonIntake = true;
@@ -662,6 +648,14 @@ public class Robot extends TimedRobot {
         break;
       case INTAKEOFF:
         autonIntake = false;
+        autonConditionCompleted = true;
+        break;
+      case SETSHOOTERSPEED:
+        shooterSpeed = Double.parseDouble(targetValue[0]);
+        autonConditionCompleted = true;
+        break;
+      case SETSPEED:
+        autonSpeedScalar = Double.parseDouble(targetValue[0]);
         autonConditionCompleted = true;
         break;
       case WAIT:
@@ -726,7 +720,6 @@ public class Robot extends TimedRobot {
       //score goal
     autonConditionCompleted = false;
     System.out.println("Started Next Auton Instruction");
-    drive.arcadeDrive(0,0);
   }
 
   public void autonStep() {
@@ -743,7 +736,7 @@ public class Robot extends TimedRobot {
         //System.out.println(movePid.getSetpoint());
         double rawValue = movePid.calculate(valueToCalculate);
         double driveValue = MathUtil.clamp(rawValue, -1, 1);
-        drive.arcadeDrive(Statics.Drive_Speed*driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
+        autonSetDrive(driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
         if (movePid.atSetpoint()) {
           autonConditionCompleted = true;
         }
@@ -752,7 +745,7 @@ public class Robot extends TimedRobot {
       // - Turns some distance in degrees
       case TURN:
         double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.3, .3);
-        drive.arcadeDrive(0,currentRotationRate);
+        autonSetDrive(0,currentRotationRate);
 
         if (gyroPid.atSetpoint()) {
           autonConditionCompleted = true;
@@ -773,8 +766,12 @@ public class Robot extends TimedRobot {
       // - Lowers the intake
       // - Condition is completed when the intake reaches the limit switch
       case DEPLOYINTAKE:
-        if (controlIntakeUppeyDowney(false) == -1) {
+        if (!topLimitSwitchIntake.get()) {
           autonConditionCompleted = true;
+          controlIntakeUppeyDowney(false, false);
+        }
+        else {
+          controlIntakeUppeyDowney(true, false);
         }
         break;
       // WAIT MODE
@@ -790,6 +787,11 @@ public class Robot extends TimedRobot {
         drive.arcadeDrive(0,0);
         break;
     }
+  }
+
+  public void autonSetDrive(double drive, double turn) {
+    autonDriveBuffer = drive;
+    autonTurnBuffer = turn;
   }
 
 }

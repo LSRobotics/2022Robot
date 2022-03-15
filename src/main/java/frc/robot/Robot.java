@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -189,6 +190,8 @@ public class Robot extends TimedRobot {
     bl_drive.setOpenLoopRampRate(0.5);
     br_drive.setOpenLoopRampRate(0.5);
     
+    verticalClimb.setNeutralMode(NeutralMode.Brake);
+
     pdp = new PowerDistribution();
     
     ballIRSensor = new AnalogInput(0);

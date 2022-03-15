@@ -17,8 +17,10 @@ public class Statics {
     public final static double Vertical_Climb_Speed = 0.5;
     public final static double Horizontal_Climb_Speed = 0.5;
 
-    public final static double Index_Speed = -.75;
+    public final static double Index_Speed = -1;
     public final static double Intake_Speed = 1;
+
+    public final static double shooting_threshold_value = .5;
 
     public final static double IntakeUppeyDowneySpeed = 0.9;
 

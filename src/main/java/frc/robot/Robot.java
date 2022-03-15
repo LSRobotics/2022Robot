@@ -45,24 +45,6 @@ import java.io.*;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-
-//import frc.robot.Constants.Statics;
-//import main.java.frc.robot.GyroPIDController;
-
-/**
- * import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-*/
-//import com.kauailabs.navx.frc.AHRS;
-//import com.ctre.phoenix.motorcontrol.NeutralMode;
-
-;
-
-
-
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -359,12 +341,13 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    controlIntake(gp2.getBButton(), gp1.getXButton(), gp1.getYButton(), gp2.getXButton());    
-    controlShooter(gp2.getYButton(), gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());
+    controlIntakeShooterIndex( gp1.getXButton(), gp1.getYButton(), gp2.getRightTriggerAxis()> .5, gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());    
+    
+
+    controlUppeyDowney(gp2.getBButton(), gp2.getXButton());
 
     climb(gp2.getYButton(), gp2.getAButton(), gp2.getPOV(), gp2.getLeftStickButtonPressed());
-
-    //System.out.println(getAverageEncoderDistance());
+   
     if(gp2.getRightStickButtonPressed())
       shooterSetAngle(servoAngle);
 
@@ -491,80 +474,81 @@ public class Robot extends TimedRobot {
     //navXAngle = navX.getAngle();
   }
 
-  //If button is pressed move until limit switch
-  public void controlIntake(boolean moveIntake, boolean reverseIntake, boolean testIntake, boolean downIntake){
-        //now runs backward with x and forwards with Y
-    //if (!bottomLimitSwitchIntake.get()){
-      if (testIntake)
+  
+  public void controlUppeyDowney(boolean upIntake, boolean downIntake){
+    if(downIntake){
+      if(!bottomLimitSwitchIntake.get()){
+        intakeUpDown.set(0);
+      }
+      else{
+        intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
+       
+      }
+    }
+    else if(upIntake){
+      if(!topLimitSwitchIntake.get()){
+        intakeUpDown.set(0);
+        
+      }
+      else{ 
+        intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
+        System.out.println(topLimitSwitchIntake.get());
+        System.out.println(intakeUpDown.get());
+      }
+    }
+    else{
+      intakeUpDown.set(0);
+    }
+  }
+
+
+  public void controlIntakeShooterIndex( boolean reverseIntake, boolean forwardIntake, boolean shoot, boolean raiseSpeed, boolean lowerSpeed){
+        
+      if (forwardIntake)
         intake.set(Statics.Intake_Speed);
       else if (reverseIntake)
         intake.set(-Statics.Intake_Speed);
       else 
         intake.set(0);
-    //}
-      if(downIntake){
-        if(!bottomLimitSwitchIntake.get()){
-          intakeUpDown.set(0);
-        }
-        else{
-          intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-         
-        }
+   
+      
+      if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM){
+        index.set(Statics.Index_Speed);
       }
-      else if(moveIntake){
-        if(!topLimitSwitchIntake.get()){
-          intakeUpDown.set(0);
-          
-        }
-        else{ 
-          intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
-          System.out.println(topLimitSwitchIntake.get());
-          System.out.println(intakeUpDown.get());
-        }
+      else if (forwardIntake && !scanForBalls()){
+        index.set(Statics.Index_Speed);
       }
       else{
-        intakeUpDown.set(0);
+        index.set(0);
       }
-  /*  if (!goingUp){
-      if (!bottomLimitSwitchIntake.get() && moveIntake) {
-        intakeUpDown.set(Statics.IntakeUppeyDowneySpeed);
-        goingUp = true;
-    } 
-  } else if (topLimitSwitchIntake.get() && moveIntake){
-      intakeUpDown.set(-Statics.IntakeUppeyDowneySpeed);
-      goingUp = false;
-  }
-    else
-      intakeUpDown.set(0);
-      */  
+
+
+
+      if(shoot) {
+        shooter.set(shooterSpeed);
+       //System.out.println(shooter.getSelectedSensorVelocity());
+        
+        }
+       else {
+        shooter.set(0);
+        
+      }
+      
+      if (raiseSpeed){
+        shooterSpeed += 0.05;
+      }
+      if (lowerSpeed){
+        shooterSpeed -= 0.05;
+      } 
   }
   
+ 
   public boolean scanForBalls(){
     return Math.pow(ballIRSensor.getAverageVoltage(), -1.2045) * 27.726 < 50;
   }
 
-  public void controlShooter(boolean shoot, boolean raiseSpeed, boolean lowerSpeed){
-    if(shoot) {
-      shooter.set(shooterSpeed);
-      System.out.println(shooter.getSelectedSensorVelocity());
-      if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM) {
-        index.set(Statics.Index_Speed); //todo
-      } else {
-          index.set(0);
-      }
-    } else {
-      shooter.set(0);
-      index.set(0);
-    }
+ 
     
-    if (raiseSpeed){
-      shooterSpeed += 0.05;
-    }
-    if (lowerSpeed){
-      shooterSpeed -= 0.05;
-    }    
-  }
-  //needs specific angles
   public void shooterSetAngle(double previousAngle){
     
     if (previousAngle == 0) {

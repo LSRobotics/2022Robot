@@ -26,7 +26,9 @@ Change Camera - Start Button
 
 Shooting Hood Adjuster - Right Stick Button
 
-Control Intake Up Down - B Button
+Control Intake Up - B Button
+
+Control Intake Down - X Button
 
 Climb Ratchet - Left Stick Button
 
@@ -34,7 +36,7 @@ Climb Up - Y Button
   
 Climb Down - A Button
 
-Climb Horizontal - Dpad
+Climb Horizontal - Up and Down on DPad
 
 -----------------------------------------------  
 

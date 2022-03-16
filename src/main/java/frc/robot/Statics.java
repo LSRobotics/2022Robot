@@ -49,8 +49,8 @@ public class Statics {
     
     public final static double SensorToMeters = 22;
 
-    public final static double movementPIDp = .8;
-    public final static double movementPIDi = 0;
+    public final static double movementPIDp = 1.2;
+    public final static double movementPIDi = .1;
     public final static double movementPidd = 0;
 
     public final static double gyroPIDp = 1;

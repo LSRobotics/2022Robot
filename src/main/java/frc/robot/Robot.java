@@ -29,6 +29,8 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.SPI;
+
 import java.util.*;
 
 import javax.lang.model.util.ElementScanner6;
@@ -39,7 +41,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.AnalogInput;
 
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SPI; //TODO: change the port system depending on what we actually use
+import edu.wpi.first.wpilibj.SerialPort; //TODO: change the port system depending on what we actually use
 
 import java.awt.Desktop;
 import java.io.*;
@@ -195,9 +197,10 @@ public class Robot extends TimedRobot {
     LED.set(-0.43);
 
     movePid = new PIDController(Statics.movementPIDp, Statics.movementPIDi, Statics.movementPidd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
+    movePid.setTolerance(.2);
     gyroPid = new PIDController(Statics.gyroPIDp, Statics.gyroPIDi, Statics.gyroPIDd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
-
-    ahrs = new AHRS(SPI.Port.kMXP);
+    gyroPid.setTolerance(2);
+    ahrs = new AHRS(SerialPort.Port.kMXP);
 
 
   }
@@ -284,7 +287,7 @@ public class Robot extends TimedRobot {
 
     controlIntakeShooterIndex(false, autonIntake, autonShoot, false, false);
 
-    drive.arcadeDrive(autonDriveBuffer, autonTurnBuffer);
+    drive.arcadeDrive(autonDriveBuffer * autonSpeedScalar, autonTurnBuffer * autonSpeedScalar);
 
   }
 
@@ -477,7 +480,7 @@ public class Robot extends TimedRobot {
 
       if(shoot) {
         shooter.set(shooterSpeed);
-       //System.out.println(shooter.getSelectedSensorVelocity());  
+       System.out.println(shooter.getSelectedSensorVelocity());  
       }
       else {
         shooter.set(0);
@@ -627,7 +630,7 @@ public class Robot extends TimedRobot {
     switch (mode) {
       case DRIVE:
         autonStartingPos = getAverageEncoderDistance();
-        movePid.setSetpoint(Double.parseDouble(targetValue[0])); //+ (autonStartingPos/Statics.SensorToMeters));
+        movePid.setSetpoint(Double.parseDouble(targetValue[0]));
         System.out.println("target value" + Double.parseDouble(targetValue[0]));
         System.out.println("Starting position"+ autonStartingPos);
         break;
@@ -738,6 +741,7 @@ public class Robot extends TimedRobot {
         //System.out.println(movePid.getSetpoint());
         double rawValue = movePid.calculate(valueToCalculate);
         double driveValue = MathUtil.clamp(rawValue, -1, 1);
+        System.out.println(valueToCalculate);
         autonSetDrive(driveValue, 0); //TODO: divide `getAverageEncoderDistance()-autonStartingPos` by the sensor units to actual units constant
         if (movePid.atSetpoint()) {
           autonConditionCompleted = true;
@@ -746,11 +750,8 @@ public class Robot extends TimedRobot {
       // TURN MODE
       // - Turns some distance in degrees
       case TURN:
-        double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getRoll()), -.4, .4);
-        System.out.println("meow");
-        System.out.println(ahrs.getRoll());
-        System.out.println(ahrs.getPitch());
-        System.out.println(ahrs.getYaw());
+        double currentRotationRate = MathUtil.clamp(gyroPid.calculate(ahrs.getAngle()), -.8, .8);
+        System.out.println(ahrs.getAngle());
         autonSetDrive(0,currentRotationRate);
         if (gyroPid.atSetpoint()) {
           autonConditionCompleted = true;

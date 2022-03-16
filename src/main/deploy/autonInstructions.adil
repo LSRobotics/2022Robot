@@ -1,4 +1,7 @@
+setspeed, .5
 setshooterspeed, .3
-wait, 3.5
+wait, 2.5
 shoot
-drive, 1.25
+drive, 1
+wait, 1
+turn, 45

@@ -1,3 +1,4 @@
-intakeon
+setshooterspeed, .3
 wait, 3.5
-intakeoff
+shoot
+drive, 1.25

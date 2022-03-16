@@ -47,9 +47,9 @@ public class Statics {
     
     public static double cm_to_in = 0.049212598;
     
-    public final static double SensorToMeters = -1.90469;
+    public final static double SensorToMeters = 22;
 
-    public final static double movementPIDp = 1;
+    public final static double movementPIDp = .8;
     public final static double movementPIDi = 0;
     public final static double movementPidd = 0;
 

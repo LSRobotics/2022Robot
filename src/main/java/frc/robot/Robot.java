@@ -116,6 +116,7 @@ public class Robot extends TimedRobot {
   NetworkTableEntry IndexTable;
   NetworkTableEntry IntakeTable;
   NetworkTableEntry shooterRPMEntry;
+  NetworkTableEntry shooterSpeedEntry;
   NetworkTableEntry ratchetEngaged;
   SimpleWidget navXEntry;
   ComplexWidget cameraTest;
@@ -410,7 +411,8 @@ public class Robot extends TimedRobot {
     ShooterTable.setDouble(shooterN);
     IntakeTable.setDouble(intakeN);
 
-    shooterRPMEntry.setDouble(shooterRPM);
+    shooterRPMEntry.setDouble(shooter.getSelectedSensorVelocity());
+    shooterSpeedEntry.setDouble(shooterSpeed);
     if (ratchetPos > 45)
       ratchetEngaged.setBoolean(true);
     else
@@ -468,7 +470,7 @@ public class Robot extends TimedRobot {
       else
         intake.set(0);
    
-      if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM){
+      if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM*shooterSpeed){
         index.set(Statics.Index_Speed);
       }
       else if (forwardIntake && !scanForBalls()){
@@ -480,7 +482,6 @@ public class Robot extends TimedRobot {
 
       if(shoot) {
         shooter.set(shooterSpeed);
-       System.out.println(shooter.getSelectedSensorVelocity());  
       }
       else {
         shooter.set(0);
@@ -580,6 +581,12 @@ public class Robot extends TimedRobot {
     .withPosition(2,2);
 
     shooterRPMEntry = compTab.add("Shooter RPM", 0)
+    .withWidget(BuiltInWidgets.kNumberBar)
+    .withSize(1,1)
+    .withPosition(7, 1)
+    .getEntry();
+
+    shooterSpeedEntry = compTab.add("Shooter Speed", 0)
     .withWidget(BuiltInWidgets.kNumberBar)
     .withSize(1,1)
     .withPosition(7, 1)

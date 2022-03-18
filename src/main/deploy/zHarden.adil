@@ -1,0 +1,13 @@
+setspeed, .5
+setshooterspeed, .7
+wait, .5
+shoot
+setspeed, .7
+drive, -.7
+setspeed, .4
+intakeon
+drive, 1.8
+wait, 3
+intakeoff
+shoot
+wait, 1

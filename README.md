@@ -10,6 +10,8 @@ An FRC Robot for the 2022 FIRST Robotics Season
 
 Moving - Arcade Drive - Cubic scaled deadband using left Y-axis and right X-axis
 
+Slow Speed - Up on the D-Pad
+
 Move Intake - Y Button
 
 Reverse Intake - X Button
@@ -21,6 +23,8 @@ Increase Shooter Speed - Right Bumper
 Decrease Shooter Speed - Left Bumper
 
 Start Shooter & Automated Index - Right Trigger Button
+
+Reverse Shooter - Left Trigger Button
 
 Change Camera - Start Button
 

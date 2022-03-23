@@ -154,6 +154,10 @@ public class Robot extends TimedRobot {
 
   private double autonStartingPos;
 
+  private double driveSpeed = Statics.Fast_Drive_Speed;
+
+  private double turnSpeed = Statics.Fast_Turn_Speed;
+
   private boolean autonIntake = false;
 
   private Timer autonTimer;
@@ -286,7 +290,7 @@ public class Robot extends TimedRobot {
       autonStep();
     }
 
-    controlIntakeShooterIndex(false, autonIntake, autonShoot, false, false);
+    controlIntakeShooterIndex(false, autonIntake, autonShoot, false, false, false);
 
     drive.arcadeDrive(autonDriveBuffer * autonSpeedScalar, autonTurnBuffer * autonSpeedScalar);
 
@@ -303,8 +307,9 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
 
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
-    controlIntakeShooterIndex(gp1.getXButton(), gp1.getYButton(), gp2.getRightTriggerAxis()> .5, gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());    
+    controlIntakeShooterIndex(gp1.getXButton(), gp1.getYButton(), gp2.getRightTriggerAxis()> .5, gp2.getLeftTriggerAxis()> .5, gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());    
     
+    controlDriveSpeed(gp1.getPOV() == 0);
 
     controlUppeyDowney(gp2.getBButton(), gp2.getXButton());
 
@@ -358,8 +363,22 @@ public class Robot extends TimedRobot {
   }
 
   private void driveTrain(double power, double turn) {
-    drive.arcadeDrive(Statics.Drive_Speed*cubicScaledDeadband(power, Statics.deadbandCutoff, Statics.Weight),
-                      Statics.Turn_Speed*cubicScaledDeadband(turn, Statics.deadbandCutoff, Statics.Weight));
+    drive.arcadeDrive(driveSpeed*cubicScaledDeadband(power, Statics.deadbandCutoff, Statics.Weight),
+                      turnSpeed*cubicScaledDeadband(turn, Statics.deadbandCutoff, Statics.Weight));
+  }
+
+
+  private void controlDriveSpeed(boolean changeSpeed){
+    if(changeSpeed){
+      if(driveSpeed == Statics.Fast_Drive_Speed){
+        driveSpeed = Statics.Slow_Drive_Speed;
+        turnSpeed = Statics.Slow_Turn_Speed;
+      }
+      else if(driveSpeed == Statics.Slow_Drive_Speed){
+          driveSpeed = Statics.Fast_Drive_Speed;
+          turnSpeed = Statics.Fast_Turn_Speed;
+      }
+    }
   }
 
   private double cubic(double x, double w){
@@ -461,7 +480,7 @@ public class Robot extends TimedRobot {
   }
 
 
-  public void controlIntakeShooterIndex(boolean reverseIntake, boolean forwardIntake, boolean shoot, boolean raiseSpeed, boolean lowerSpeed){
+  public void controlIntakeShooterIndex(boolean reverseIntake, boolean forwardIntake, boolean shoot, boolean reverseShoot, boolean raiseSpeed, boolean lowerSpeed){
         
       if (forwardIntake)
         intake.set(Statics.Intake_Speed);
@@ -470,7 +489,7 @@ public class Robot extends TimedRobot {
       else
         intake.set(0);
    
-      if (Math.abs(shooter.getSelectedSensorVelocity()) > Statics.Shooter_Target_RPM*shooterSpeed){
+      if (shooter.getSelectedSensorVelocity() > Statics.Shooter_Target_RPM*shooterSpeed){
         index.set(Statics.Index_Speed);
       }
       else if (forwardIntake && !scanForBalls()){
@@ -482,6 +501,9 @@ public class Robot extends TimedRobot {
 
       if(shoot) {
         shooter.set(shooterSpeed);
+      }
+      else if(reverseShoot){
+        shooter.set(-shooterSpeed);
       }
       else {
         shooter.set(0);

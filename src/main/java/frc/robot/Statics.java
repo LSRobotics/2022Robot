@@ -18,7 +18,7 @@ public class Statics {
     public final static double Horizontal_Climb_Speed = 0.5;
 
     public final static double Index_Speed = -1;
-    public final static double Intake_Speed = 1;
+    public final static double Intake_Speed = 0.8;
 
     public final static double shooting_threshold_value = .5;
 
@@ -28,8 +28,10 @@ public class Statics {
     public final static double Shooter_Target_RPM = 18000;
     public final static double Shooter_Speed = 0.5;
     
-    public final static double Drive_Speed = 0.8;
-    public final static double Turn_Speed = 0.7;
+    public final static double Fast_Drive_Speed = 0.8;
+    public final static double Slow_Drive_Speed = 0.4;
+    public final static double Fast_Turn_Speed = 0.7;
+    public final static double Slow_Turn_Speed = 0.4;
   
     //weight for cubic function
     public final static double Weight = 0.5;

@@ -1,5 +1,5 @@
 setspeed, .4
-setshooterspeed, .4
+setshooterspeed, .34
 wait, 2.5
 shoot
 drive, 2.5

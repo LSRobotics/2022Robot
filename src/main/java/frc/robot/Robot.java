@@ -555,10 +555,11 @@ public class Robot extends TimedRobot {
         shooter.set(0);
       }
       
-      if (raiseSpeed){
+      if (raiseSpeed && shooterSpeed < 1){
         shooterSpeed += 0.05;
       }
-      if (lowerSpeed){
+
+      if (lowerSpeed && shooterSpeed > 0){
         shooterSpeed -= 0.05;
       } 
   }

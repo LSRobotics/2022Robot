@@ -16,6 +16,7 @@ Move Intake - Y Button
 
 Reverse Intake - X Button
 
+Auto Climb Align - B Button
 ### Gamepad 2
 
 Increase Shooter Speed - Right Bumper

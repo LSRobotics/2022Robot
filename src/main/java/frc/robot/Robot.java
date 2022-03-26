@@ -152,6 +152,8 @@ public class Robot extends TimedRobot {
 
   private AHRS ahrs;
 
+  private double startingPos;
+
   private enum AutonMode {
     DRIVE,
     TURN,
@@ -190,6 +192,8 @@ public class Robot extends TimedRobot {
   private double autonTurnBuffer = 0;
 
   private boolean autonShoot = false;
+
+  private boolean autoMove = false;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -340,7 +344,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
+    driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX(), gp1.getBButtonPressed());
     controlIntakeShooterIndex(gp1.getXButton(), gp1.getYButton(), gp2.getRightTriggerAxis()> .5, gp2.getLeftTriggerAxis()> .5, gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());    
     
     controlDriveSpeed(gp1.getAButtonPressed());
@@ -355,6 +359,8 @@ public class Robot extends TimedRobot {
     if(gp2.getStartButtonPressed())
       Camera.changeCam();
   }
+
+
 
   /** This function is called once when the robot is disabled. */
   @Override
@@ -396,11 +402,31 @@ public class Robot extends TimedRobot {
 
   }
 
-  private void driveTrain(double power, double turn) {
+  private void driveTrain(double power, double turn, boolean alignClimb) {
+    if (alignClimb){
+      movePid.setSetpoint(2);
+      autoMove = true;
+      startingPos = getAverageEncoderDistance();
+    }
+
+    if (autoMove) {
+      double valueToCalculate = (getAverageEncoderDistance()-startingPos)/Statics.SensorToMeters;
+      double rawValue = movePid.calculate(valueToCalculate);
+      double driveValue = MathUtil.clamp(rawValue, -1, 1);
+      drive.arcadeDrive(driveValue, 0);
+      if (movePid.atSetpoint()) {
+        autoMove = false;
+      }
+    } else {
     drive.arcadeDrive(driveSpeed*cubicScaledDeadband(power, Statics.deadbandCutoff, Statics.Weight),
                       turnSpeed*cubicScaledDeadband(turn, Statics.deadbandCutoff, Statics.Weight));
+    }
   }
 
+
+  private void autoClimbAlign(boolean beginAlign){
+   
+  }
 
   private void controlDriveSpeed(boolean changeSpeed){
     if(changeSpeed){

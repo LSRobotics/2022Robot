@@ -343,7 +343,7 @@ public class Robot extends TimedRobot {
     driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
     controlIntakeShooterIndex(gp1.getXButton(), gp1.getYButton(), gp2.getRightTriggerAxis()> .5, gp2.getLeftTriggerAxis()> .5, gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());    
     
-    controlDriveSpeed(gp1.getPOV() == 0);
+    controlDriveSpeed(gp1.getAButtonPressed());
 
     //controlUppeyDowney(gp2.getBButton(), gp2.getXButton());
 

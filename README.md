@@ -10,7 +10,7 @@ An FRC Robot for the 2022 FIRST Robotics Season
 
 Moving - Arcade Drive - Cubic scaled deadband using left Y-axis and right X-axis
 
-Slow Speed - Up on the D-Pad
+Speed Change - A Button
 
 Move Intake - Y Button
 

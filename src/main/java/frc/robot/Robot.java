@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
   public CANSparkMax bl_drive;
   public CANSparkMax br_drive;
 
-  public Servo climbRatchet;
+  public Servo climbStopper;
 
   public WPI_TalonFX verticalClimb;
   public Spark horizontalClimb;
@@ -333,7 +333,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    climbRatchet.set(0);
+    climbStopper.set(0);
   }
 
   /** This function is called periodically during operator control. */
@@ -392,7 +392,7 @@ public class Robot extends TimedRobot {
 
     verticalClimb = new WPI_TalonFX(Statics.Vertical_Climb_Motor_ID);
     horizontalClimb = new Spark(Statics.Horizontal_Climb_Motor_ID);
-    climbRatchet = new Servo(Statics.Climb_Ratchet_ID);
+    climbStopper = new Servo(Statics.Climb_Ratchet_ID);
 
   }
 
@@ -431,7 +431,7 @@ public class Robot extends TimedRobot {
     }
   }
 
-  public void climb(boolean up, boolean down, int horizontalDirection, boolean ratchetButton){
+  public void climb(boolean up, boolean down, int horizontalDirection, boolean climbStopperButton){
     if (up){
       verticalClimb.set(Statics.Vertical_Climb_Speed);
     } else if (down) {
@@ -448,10 +448,10 @@ public class Robot extends TimedRobot {
       horizontalClimb.set(0);
     }
 
-    if (ratchetButton && climbRatchet.get() == 0){
-      climbRatchet.set(1);
-    } else if (ratchetButton && climbRatchet.get() == 1){
-      climbRatchet.set(0);
+    if (climbStopperButton && climbStopper.get() == 0){
+      climbStopper.set(1);
+    } else if (climbStopperButton && climbStopper.get() == 1){
+      climbStopper.set(0);
     }
 
   }
@@ -484,7 +484,7 @@ public class Robot extends TimedRobot {
     shooterN = shooter.get();
     indexN = index.get();
     intakeN = intake.get();
-    ratchetPos = climbRatchet.getAngle();
+    ratchetPos = climbStopper.getAngle();
 
     //shooterRPM = 0;
     shooter.getSelectedSensorVelocity();

@@ -41,12 +41,17 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.AnalogInput;
 
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SerialPort; //TODO: change the port system depending on what we actually use
+import edu.wpi.first.wpilibj.SerialPort;
 
 import java.awt.Desktop;
 import java.io.*;
 import java.util.Scanner;
 import java.util.stream.Collectors;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -90,6 +95,18 @@ public class Robot extends TimedRobot {
   double navXAngle;
   double ratchetPos;
 
+  double limelightX;
+  double limelightY;
+  double limelightArea;
+
+  double angleToGoalDegrees;
+  double angleToGoalRadians;
+
+
+  double distanceFromLimelightToGoalInches;
+  
+  
+
   public XboxController gp1;
   public XboxController gp2;
 
@@ -120,6 +137,10 @@ public class Robot extends TimedRobot {
   NetworkTableEntry ratchetEngaged;
   SimpleWidget navXEntry;
   ComplexWidget cameraTest;
+
+  NetworkTableEntry tx;
+  NetworkTableEntry ty;
+  NetworkTableEntry ta;
 
 
 
@@ -152,6 +173,8 @@ public class Robot extends TimedRobot {
 
   private double autonTarget;
 
+ 
+
   private double autonStartingPos;
 
   private double driveSpeed = Statics.Fast_Drive_Speed;
@@ -176,6 +199,13 @@ public class Robot extends TimedRobot {
   public void robotInit() {
 
     Camera.startCameras();
+
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    tx = table.getEntry("tx");
+    ty = table.getEntry("ty");
+    ta = table.getEntry("ta");
+
+    
 
     initializeMotorControllers();
 
@@ -221,6 +251,10 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     updateInputs();
     updateNetworkEntries();
+    limelightX = tx.getDouble(0);
+    limelightY = ty.getDouble(0);
+    limelightArea = ta.getDouble(0);
+
 
   }
   /**
@@ -311,7 +345,7 @@ public class Robot extends TimedRobot {
     
     controlDriveSpeed(gp1.getPOV() == 0);
 
-    controlUppeyDowney(gp2.getBButton(), gp2.getXButton());
+    //controlUppeyDowney(gp2.getBButton(), gp2.getXButton());
 
     climb(gp2.getYButton(), gp2.getAButton(), gp2.getPOV(), gp2.getLeftStickButtonPressed());
    
@@ -430,6 +464,9 @@ public class Robot extends TimedRobot {
     ShooterTable.setDouble(shooterN);
     IntakeTable.setDouble(intakeN);
 
+    
+    
+
     shooterRPMEntry.setDouble(shooter.getSelectedSensorVelocity());
     shooterSpeedEntry.setDouble(shooterSpeed);
     if (ratchetPos > 45)
@@ -456,7 +493,7 @@ public class Robot extends TimedRobot {
   }
 
   
-  public void controlUppeyDowney(boolean upIntake, boolean downIntake){
+  /*public void controlUppeyDowney(boolean upIntake, boolean downIntake){
     if(downIntake){
       if(!bottomLimitSwitchIntake.get()){
         intakeUpDown.set(0);
@@ -478,7 +515,7 @@ public class Robot extends TimedRobot {
       intakeUpDown.set(0);
     }
   }
-
+*/
 
   public void controlIntakeShooterIndex(boolean reverseIntake, boolean forwardIntake, boolean shoot, boolean reverseShoot, boolean raiseSpeed, boolean lowerSpeed){
         
@@ -501,6 +538,15 @@ public class Robot extends TimedRobot {
 
       if(shoot) {
         shooter.set(shooterSpeed);
+        
+        angleToGoalDegrees = Statics.Limelight_Mount_Angle_Degrees + limelightY;
+        angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+
+
+        distanceFromLimelightToGoalInches = (Statics.Goal_Height_Inches - Statics.LimeLight_Height_Inches)/Math.tan(angleToGoalRadians);
+
+        System.out.println(distanceFromLimelightToGoalInches);
+
       }
       else if(reverseShoot){
         shooter.set(-shooterSpeed);
@@ -673,7 +719,7 @@ public class Robot extends TimedRobot {
         break;
       case DEPLOYINTAKE:
         //deploy the intake by applying speed to the motor
-        controlUppeyDowney(false, true);
+        //controlUppeyDowney(false, true);
         break;
       case INTAKEON:
         autonIntake = true;
@@ -805,10 +851,10 @@ public class Robot extends TimedRobot {
       case DEPLOYINTAKE:
         if (!bottomLimitSwitchIntake.get()) {
           autonConditionCompleted = true;
-          controlUppeyDowney(false, false);
+          //controlUppeyDowney(false, false);
         }
         else {
-          controlUppeyDowney(false, true);
+          //controlUppeyDowney(false, true);
         }
         break;
       // WAIT MODE

@@ -14,6 +14,11 @@ public class Statics {
     public final static int Horizontal_Climb_Motor_ID = 8; 
     public final static int Climb_Ratchet_ID = 3;
 
+    public final static double Limelight_Mount_Angle_Degrees = 25.0;
+    public final static double LimeLight_Height_Inches = 25.0;
+    public final static double Goal_Height_Inches = 102.0;
+    
+    
     public final static double Vertical_Climb_Speed = 0.5;
     public final static double Horizontal_Climb_Speed = 0.5;
 

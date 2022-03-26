@@ -434,6 +434,9 @@ public class Robot extends TimedRobot {
   public void climb(boolean up, boolean down, int horizontalDirection, boolean climbStopperButton){
     if (up){
       verticalClimb.set(Statics.Vertical_Climb_Speed);
+      if (climbStopper.get() != 1){
+        climbStopper.set(1);
+      }
     } else if (down) {
       verticalClimb.set(-Statics.Vertical_Climb_Speed);
     } else {

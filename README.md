@@ -34,7 +34,7 @@ Control Intake Up - B Button
 
 Control Intake Down - X Button
 
-Climb Ratchet - Left Stick Button
+Climb Stopper - Left Stick Button
 
 Climb Up - Y Button
   

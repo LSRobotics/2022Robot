@@ -499,7 +499,7 @@ public class Robot extends TimedRobot {
 
     */
     
-
+    
     shooterRPMEntry.setDouble(shooter.getSelectedSensorVelocity());
     shooterSpeedEntry.setDouble(shooterSpeed);
     if (ratchetPos > 45)
@@ -676,12 +676,12 @@ public class Robot extends TimedRobot {
     .withSize( 4, 4)
     .withPosition(2 , 0); 
 
-    /*
+        
     compTab.add("Camera Numero Two",Camera.cam1)
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize(4,4)
     .withPosition(6,0);
-    
+    /*
     compTab.add("Differential Drive", drive)
     .withWidget(BuiltInWidgets.kDifferentialDrive)
     .withSize(1,1)

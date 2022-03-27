@@ -644,7 +644,9 @@ public class Robot extends TimedRobot {
     .withSize(1,1)
     .withPosition(4,2);
 
+    
     //Start of competition tab stuff
+    /*
     rightMotorNetworkTable = compTab.add("Right Motor Value", 1)
     .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)
@@ -662,8 +664,9 @@ public class Robot extends TimedRobot {
     .withSize(1, 1)
     .withPosition(7, 0)
     .getEntry();
+    */
 
-    cameraTest = compTab.add("camera",Camera.cam0)
+    compTab.add("camera",Camera.cam0)
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize( 2, 2)
     .withPosition(4 , 0);
@@ -672,12 +675,13 @@ public class Robot extends TimedRobot {
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize(1,1)
     .withPosition(4,2);
-
+    /*
     compTab.add("Differential Drive", drive)
     .withWidget(BuiltInWidgets.kDifferentialDrive)
     .withSize(1,1)
     .withPosition(2,2);
-
+    */
+    
     shooterRPMEntry = compTab.add("Shooter RPM", 0)
     .withWidget(BuiltInWidgets.kNumberBar)
     .withSize(1,1)

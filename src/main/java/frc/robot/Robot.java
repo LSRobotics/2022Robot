@@ -671,16 +671,17 @@ public class Robot extends TimedRobot {
     .getEntry();
     */
 
-    compTab.add("camera",Camera.cam0)
+    compTab.add("camera", Camera.server.getSource())
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize( 4, 4)
-    .withPosition(2 , 0);
+    .withPosition(2 , 0); 
 
+    /*
     compTab.add("Camera Numero Two",Camera.cam1)
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize(4,4)
     .withPosition(6,0);
-    /*
+    
     compTab.add("Differential Drive", drive)
     .withWidget(BuiltInWidgets.kDifferentialDrive)
     .withSize(1,1)

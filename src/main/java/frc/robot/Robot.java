@@ -124,14 +124,16 @@ public class Robot extends TimedRobot {
   DigitalInput topLimitSwitchIntake = new DigitalInput(3);
   Servo angleAdjuster = new Servo(4); //channel??
 
-  ShuffleboardTab testTab = Shuffleboard.getTab("Test Board");
+  //ShuffleboardTab testTab = Shuffleboard.getTab("Test Board");
   ShuffleboardTab compTab = Shuffleboard.getTab("Competition Board");
+  /*
   NetworkTableEntry rightMotorNetworkTable;
   NetworkTableEntry leftMotorNetworkTable;
   NetworkTableEntry pdpVoltage;
   NetworkTableEntry ShooterTable;
   NetworkTableEntry IndexTable;
   NetworkTableEntry IntakeTable;
+  */
   NetworkTableEntry shooterRPMEntry;
   NetworkTableEntry shooterSpeedEntry;
   NetworkTableEntry ratchetEngaged;
@@ -281,6 +283,7 @@ public class Robot extends TimedRobot {
     ArrayList<AutonMode> tempAutonModes = new ArrayList<AutonMode>();
     ArrayList<String[]> tempAutonArguments = new ArrayList<String[]>();
 
+    climbStopper.set(1);
     //Spaghetti code:
     File autonInstructionFile = new File(Filesystem.getDeployDirectory().getPath() + "/autonInstructions.adil");
     try (Scanner input = new Scanner(autonInstructionFile)) {
@@ -337,7 +340,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    climbStopper.set(0);
+    
   }
 
   /** This function is called periodically during operator control. */
@@ -460,8 +463,8 @@ public class Robot extends TimedRobot {
   public void climb(boolean up, boolean down, int horizontalDirection, boolean climbStopperButton){
     if (up){
       verticalClimb.set(Statics.Vertical_Climb_Speed);
-      if (climbStopper.get() != 1){
-        climbStopper.set(1);
+      if (climbStopper.get() != 0){
+        climbStopper.set(0);
       }
     } else if (down) {
       verticalClimb.set(-Statics.Vertical_Climb_Speed);
@@ -485,6 +488,7 @@ public class Robot extends TimedRobot {
 
   }
   public void updateNetworkEntries(){
+    /*
     pdpVoltage.setDouble(pdpNum);
     rightMotorNetworkTable.setDouble(rightMotorN);
     leftMotorNetworkTable.setDouble(leftMotorN);
@@ -493,7 +497,7 @@ public class Robot extends TimedRobot {
     ShooterTable.setDouble(shooterN);
     IntakeTable.setDouble(intakeN);
 
-    
+    */
     
 
     shooterRPMEntry.setDouble(shooter.getSelectedSensorVelocity());
@@ -616,6 +620,7 @@ public class Robot extends TimedRobot {
     }
 
   public void shuffleboardStartup(){
+    /*
     rightMotorNetworkTable = testTab.add("Right Motor Value", 1)
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
     .withSize(2, 1)
@@ -643,7 +648,7 @@ public class Robot extends TimedRobot {
     .withWidget(BuiltInWidgets.kCameraStream)
     .withSize(1,1)
     .withPosition(4,2);
-
+    */
     
     //Start of competition tab stuff
     /*
@@ -668,13 +673,13 @@ public class Robot extends TimedRobot {
 
     compTab.add("camera",Camera.cam0)
     .withWidget(BuiltInWidgets.kCameraStream)
-    .withSize( 2, 2)
-    .withPosition(4 , 0);
+    .withSize( 4, 4)
+    .withPosition(2 , 0);
 
     compTab.add("Camera Numero Two",Camera.cam1)
     .withWidget(BuiltInWidgets.kCameraStream)
-    .withSize(1,1)
-    .withPosition(4,2);
+    .withSize(4,4)
+    .withPosition(6,0);
     /*
     compTab.add("Differential Drive", drive)
     .withWidget(BuiltInWidgets.kDifferentialDrive)
@@ -683,39 +688,41 @@ public class Robot extends TimedRobot {
     */
     
     shooterRPMEntry = compTab.add("Shooter RPM", 0)
-    .withWidget(BuiltInWidgets.kNumberBar)
+    .withWidget(BuiltInWidgets.kDial)
     .withSize(1,1)
-    .withPosition(7, 1)
+    .withPosition(0, 2)
     .getEntry();
 
     shooterSpeedEntry = compTab.add("Shooter Speed", 0)
     .withWidget(BuiltInWidgets.kNumberBar)
     .withSize(1,1)
-    .withPosition(7, 1)
+    .withPosition(0, 1)
     .getEntry();
-
+    /*
     IntakeTable = compTab.add("Intake", 0)
     .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", -1, "max", 1))
     .withSize(1, 1)
     .withPosition(7, 3)
     .getEntry();
-
+    
     ShooterTable = compTab.add("Shooter", 0)
     .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", -1, "max", 1))
     .withSize(1, 1)
     .withPosition(6, 3)
     .getEntry();
-
+    
+    
     IndexTable = compTab.add("Index", 0)
     .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min", -1, "max", 1))
     .withSize(1, 1)
     .withPosition(7, 4)
     .getEntry();
+    */
 
-    ratchetEngaged = compTab.add("Ratchet", true)
+    ratchetEngaged = compTab.add("Climb Stopper", true)
     .withWidget(BuiltInWidgets.kBooleanBox)
     .withSize(1,1)
-    .withPosition(3,3)
+    .withPosition(0,0)
     .getEntry();
     /*
     compTab.add("navX Angle", navX)

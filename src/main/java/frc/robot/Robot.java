@@ -359,8 +359,20 @@ public class Robot extends TimedRobot {
     if(gp2.getRightStickButtonPressed())
       shooterSetAngle(servoAngle);
 
-    if(gp2.getStartButtonPressed())
+    if(gp2.getStartButtonPressed()){
       Camera.changeCam();
+
+    }
+
+
+    
+    angleToGoalDegrees = Statics.Limelight_Mount_Angle_Degrees + limelightY;
+    angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+
+
+    distanceFromLimelightToGoalInches = (Statics.Goal_Height_Inches - Statics.LimeLight_Height_Inches)/Math.tan(angleToGoalRadians);
+
+    System.out.println(distanceFromLimelightToGoalInches);
   }
 
 
@@ -572,13 +584,7 @@ public class Robot extends TimedRobot {
       if(shoot) {
         shooter.set(shooterSpeed);
         
-        angleToGoalDegrees = Statics.Limelight_Mount_Angle_Degrees + limelightY;
-        angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
-
-
-        distanceFromLimelightToGoalInches = (Statics.Goal_Height_Inches - Statics.LimeLight_Height_Inches)/Math.tan(angleToGoalRadians);
-
-        System.out.println(distanceFromLimelightToGoalInches);
+        
 
       }
       else if(reverseShoot){

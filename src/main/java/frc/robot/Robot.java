@@ -65,6 +65,10 @@ public class Robot extends TimedRobot {
   MotorControllerGroup right_motors;
   DifferentialDrive drive;
 
+
+  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+
+
   public CANSparkMax fl_drive;
   public CANSparkMax fr_drive;
   public CANSparkMax bl_drive;
@@ -207,10 +211,8 @@ public class Robot extends TimedRobot {
 
     Camera.startCameras();
 
-    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-    tx = table.getEntry("tx");
-    ty = table.getEntry("ty");
-    ta = table.getEntry("ta");
+    
+    
 
     
 
@@ -258,6 +260,10 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     updateInputs();
     updateNetworkEntries();
+    tx = table.getEntry("tx");
+    ty = table.getEntry("ty");
+    ta = table.getEntry("ta");
+    
     limelightX = tx.getDouble(0);
     limelightY = ty.getDouble(0);
     limelightArea = ta.getDouble(0);

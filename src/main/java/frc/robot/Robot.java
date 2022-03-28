@@ -139,6 +139,7 @@ public class Robot extends TimedRobot {
   NetworkTableEntry ratchetEngaged;
   SimpleWidget navXEntry;
   ComplexWidget cameraTest;
+  NetworkTableEntry distanceToTarget;
 
   NetworkTableEntry tx;
   NetworkTableEntry ty;
@@ -511,7 +512,7 @@ public class Robot extends TimedRobot {
 
     */
     
-    
+    distanceToTarget.setDouble(distanceFromLimelightToGoalInches);
     shooterRPMEntry.setDouble(shooter.getSelectedSensorVelocity());
     shooterSpeedEntry.setDouble(shooterSpeed);
     if (ratchetPos > 45)
@@ -730,6 +731,11 @@ public class Robot extends TimedRobot {
     .withWidget(BuiltInWidgets.kBooleanBox)
     .withSize(1,1)
     .withPosition(0,0)
+    .getEntry();
+    
+    distanceToTarget = compTab.add("Distance to Goal", 0)
+    .withSize(1,1)
+    .withPosition(1,0)
     .getEntry();
     /*
     compTab.add("navX Angle", navX)

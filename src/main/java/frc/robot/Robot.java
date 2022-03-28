@@ -262,6 +262,12 @@ public class Robot extends TimedRobot {
     limelightY = ty.getDouble(0);
     limelightArea = ta.getDouble(0);
 
+    angleToGoalDegrees = Statics.Limelight_Mount_Angle_Degrees + limelightY;
+    angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+
+
+    distanceFromLimelightToGoalInches = (Statics.Goal_Height_Inches - Statics.LimeLight_Height_Inches)/Math.tan(angleToGoalRadians);
+
 
   }
   /**
@@ -367,13 +373,9 @@ public class Robot extends TimedRobot {
 
 
     
-    angleToGoalDegrees = Statics.Limelight_Mount_Angle_Degrees + limelightY;
-    angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+    
 
-
-    distanceFromLimelightToGoalInches = (Statics.Goal_Height_Inches - Statics.LimeLight_Height_Inches)/Math.tan(angleToGoalRadians);
-
-    System.out.println(distanceFromLimelightToGoalInches);
+    
   }
 
 

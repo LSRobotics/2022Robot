@@ -1,12 +1,12 @@
 setspeed, .5
-setshooterspeed, .4
+setshooterspeed, .35
 wait, .5
 shoot
 wait, .5
-setspeed, .4
+setspeed, .5
 intakeon
-drive, 1.5
-setshooterspeed, .5
+drive, 2.2
+setshooterspeed, .7
 wait, 3
 intakeoff
 shoot

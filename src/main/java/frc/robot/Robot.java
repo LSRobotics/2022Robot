@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.SPI;
@@ -99,6 +100,8 @@ public class Robot extends TimedRobot {
   double navXAngle;
   double ratchetPos;
 
+  boolean climbLED = false;
+
   double limelightX;
   double limelightY;
   double limelightArea;
@@ -109,7 +112,7 @@ public class Robot extends TimedRobot {
 
   double distanceFromLimelightToGoalInches;
   
-  
+  double servoStartingAngle = 0;
 
   public XboxController gp1;
   public XboxController gp2;
@@ -191,6 +194,7 @@ public class Robot extends TimedRobot {
   private double turnSpeed = Statics.Fast_Turn_Speed;
 
   private boolean autonIntake = false;
+  private boolean climbStopperDown;
 
   private Timer autonTimer;
   private double autonTimeFinish = 0.0;
@@ -211,10 +215,6 @@ public class Robot extends TimedRobot {
 
     Camera.startCameras();
 
-    
-    
-
-    
 
     initializeMotorControllers();
 
@@ -238,8 +238,7 @@ public class Robot extends TimedRobot {
     ballIRSensor = new AnalogInput(0);
 
     shuffleboardStartup();
-    LED.set(-0.15);
-
+   
     movePid = new PIDController(Statics.movementPIDp, Statics.movementPIDi, Statics.movementPidd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
     movePid.setTolerance(.2);
     gyroPid = new PIDController(Statics.gyroPIDp, Statics.gyroPIDi, Statics.gyroPIDd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
@@ -268,13 +267,27 @@ public class Robot extends TimedRobot {
     limelightY = ty.getDouble(0);
     limelightArea = ta.getDouble(0);
 
+
     angleToGoalDegrees = Statics.Limelight_Mount_Angle_Degrees + limelightY;
     angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
 
 
     distanceFromLimelightToGoalInches = (Statics.Goal_Height_Inches - Statics.LimeLight_Height_Inches)/Math.tan(angleToGoalRadians);
 
-
+    if(climbLED){
+      if(DriverStation.getAlliance() == DriverStation.Alliance.Blue && LED.get() != -0.95){
+          LED.set(-0.95);
+      }
+      else if(DriverStation.getAlliance() == DriverStation.Alliance.Red && LED.get() != -0.93){
+          LED.set(-0.93);
+      }
+    }
+    else if(scanForBalls() && LED.get() != 0.67){
+      LED.set(0.67);
+    }
+    else if(!scanForBalls() && LED.get() != 0.43){
+      LED.set(0.43);
+    }
   }
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
@@ -296,7 +309,7 @@ public class Robot extends TimedRobot {
     ArrayList<AutonMode> tempAutonModes = new ArrayList<AutonMode>();
     ArrayList<String[]> tempAutonArguments = new ArrayList<String[]>();
 
-    climbStopper.set(1);
+    //climbStopper.set(1);
     //Spaghetti code:
     File autonInstructionFile = new File(Filesystem.getDeployDirectory().getPath() + "/autonInstructions.adil");
     try (Scanner input = new Scanner(autonInstructionFile)) {
@@ -353,7 +366,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    
+    servoStartingAngle = climbStopper.getAngle();
   }
 
   /** This function is called periodically during operator control. */
@@ -439,9 +452,9 @@ public class Robot extends TimedRobot {
   }
 
 
-  private void autoClimbAlign(boolean beginAlign){
+  //private void autoClimbAlign(boolean beginAlign){
    
-  }
+  //}
 
   private void controlDriveSpeed(boolean changeSpeed){
     if(changeSpeed){
@@ -474,12 +487,10 @@ public class Robot extends TimedRobot {
 
   public void climb(boolean up, boolean down, int horizontalDirection, boolean climbStopperButton){
     if (up){
-      verticalClimb.set(Statics.Vertical_Climb_Speed);
-     // if (climbStopper.get() != 0){
-      //  climbStopper.set(0);
-     // }
-    } else if (down) {
       verticalClimb.set(-Statics.Vertical_Climb_Speed);
+      climbLED = true;
+    } else if (down) {
+      verticalClimb.set(Statics.Vertical_Climb_Speed);
     } else {
       verticalClimb.set(0);
     }
@@ -492,10 +503,12 @@ public class Robot extends TimedRobot {
       horizontalClimb.set(0);
     }
 
-    if (climbStopperButton && climbStopper.get() == 0){
-      climbStopper.set(1);
-    } else if (climbStopperButton && climbStopper.get() == 1){
-      climbStopper.set(0);
+    if (climbStopperButton && climbStopperDown){
+      climbStopper.setAngle(-90);
+      climbStopperDown = false;
+    } else if (climbStopperButton && climbStopperDown == false){
+      climbStopper.setAngle(90);
+      climbStopperDown = true;
     }
 
   }

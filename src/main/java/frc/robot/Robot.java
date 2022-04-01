@@ -112,7 +112,7 @@ public class Robot extends TimedRobot {
 
   double distanceFromLimelightToGoalInches;
   
-  double servoStartingAngle = 0;
+  
 
   public XboxController gp1;
   public XboxController gp2;
@@ -194,7 +194,7 @@ public class Robot extends TimedRobot {
   private double turnSpeed = Statics.Fast_Turn_Speed;
 
   private boolean autonIntake = false;
-  private boolean climbStopperDown;
+  
 
   private Timer autonTimer;
   private double autonTimeFinish = 0.0;
@@ -309,7 +309,7 @@ public class Robot extends TimedRobot {
     ArrayList<AutonMode> tempAutonModes = new ArrayList<AutonMode>();
     ArrayList<String[]> tempAutonArguments = new ArrayList<String[]>();
 
-    //climbStopper.set(1);
+    climbStopper.set(.5);
     //Spaghetti code:
     File autonInstructionFile = new File(Filesystem.getDeployDirectory().getPath() + "/autonInstructions.adil");
     try (Scanner input = new Scanner(autonInstructionFile)) {
@@ -349,7 +349,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     //When each step of autonomous is completed
-
+  
     if (autonConditionCompleted) {
       autonNextAction();
     }
@@ -366,7 +366,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    servoStartingAngle = climbStopper.getAngle();
+     
   }
 
   /** This function is called periodically during operator control. */
@@ -503,12 +503,11 @@ public class Robot extends TimedRobot {
       horizontalClimb.set(0);
     }
 
-    if (climbStopperButton && climbStopperDown){
-      climbStopper.setAngle(-90);
-      climbStopperDown = false;
-    } else if (climbStopperButton && climbStopperDown == false){
-      climbStopper.setAngle(90);
-      climbStopperDown = true;
+    if (climbStopperButton && climbStopper.get() != 0){
+      climbStopper.set(0);
+    } 
+    else if (climbStopperButton && climbStopper.get() != .5){
+      climbStopper.set(.5); 
     }
 
   }

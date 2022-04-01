@@ -238,7 +238,7 @@ public class Robot extends TimedRobot {
     ballIRSensor = new AnalogInput(0);
 
     shuffleboardStartup();
-    LED.set(-0.43);
+    LED.set(-0.15);
 
     movePid = new PIDController(Statics.movementPIDp, Statics.movementPIDi, Statics.movementPidd); //TODO: figure out the kP, kI, and kD values required for actual instantiation
     movePid.setTolerance(.2);
@@ -360,7 +360,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX(), gp1.getBButtonPressed());
+    driveTrain(gp1.getRightTriggerAxis()-gp1.getLeftTriggerAxis(), gp1.getLeftX());
     controlIntakeShooterIndex(gp1.getXButton(), gp1.getYButton(), gp2.getRightTriggerAxis()> .5, gp2.getLeftTriggerAxis()> .5, gp2.getRightBumperPressed(), gp2.getLeftBumperPressed());    
     
     controlDriveSpeed(gp1.getAButtonPressed());
@@ -376,10 +376,6 @@ public class Robot extends TimedRobot {
       Camera.changeCam();
 
     }
-
-
-    
-    
 
     
   }
@@ -426,12 +422,7 @@ public class Robot extends TimedRobot {
 
   }
 
-  private void driveTrain(double power, double turn, boolean alignClimb) {
-    if (alignClimb){
-      movePid.setSetpoint(2);
-      autoMove = true;
-      startingPos = getAverageEncoderDistance();
-    }
+  private void driveTrain(double power, double turn) {
 
     if (autoMove) {
       double valueToCalculate = (getAverageEncoderDistance()-startingPos)/Statics.SensorToMeters;
@@ -484,9 +475,9 @@ public class Robot extends TimedRobot {
   public void climb(boolean up, boolean down, int horizontalDirection, boolean climbStopperButton){
     if (up){
       verticalClimb.set(Statics.Vertical_Climb_Speed);
-      if (climbStopper.get() != 0){
-        climbStopper.set(0);
-      }
+     // if (climbStopper.get() != 0){
+      //  climbStopper.set(0);
+     // }
     } else if (down) {
       verticalClimb.set(-Statics.Vertical_Climb_Speed);
     } else {
@@ -574,9 +565,9 @@ public class Robot extends TimedRobot {
   public void controlIntakeShooterIndex(boolean reverseIntake, boolean forwardIntake, boolean shoot, boolean reverseShoot, boolean raiseSpeed, boolean lowerSpeed){
         
       if (forwardIntake)
-        intake.set(Statics.Intake_Speed);
-      else if (reverseIntake)
         intake.set(-Statics.Intake_Speed);
+      else if (reverseIntake)
+        intake.set(Statics.Intake_Speed);
       else
         intake.set(0);
    

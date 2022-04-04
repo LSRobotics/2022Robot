@@ -6,7 +6,7 @@ wait, .5
 setspeed, .5
 intakeon
 drive, 2.2
-setshooterspeed, .7
+setshooterspeed, .65
 wait, 3
 intakeoff
 shoot

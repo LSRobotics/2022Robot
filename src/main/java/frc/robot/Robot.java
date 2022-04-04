@@ -148,10 +148,13 @@ public class Robot extends TimedRobot {
   ComplexWidget cameraTest;
   NetworkTableEntry distanceToTarget;
 
-  NetworkTableEntry tx;
-  NetworkTableEntry ty;
-  NetworkTableEntry ta;
+  double tx;
+  double ty;
+  double ta;
 
+  NetworkTableEntry MyContourReport;
+
+  double defaultDouble;
 
 
   //AutonInit
@@ -257,15 +260,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+  
+   // MyContourReport = NetworkTableInstance.getDefault().getTable("limelight");
+    //ty = MyContourReport.getEntry("ty").getDouble(defaultDouble);
+   // SmartDashboard.putNumber("ty",ty);
+    
+    
     updateInputs();
     updateNetworkEntries();
-    tx = table.getEntry("tx");
-    ty = table.getEntry("ty");
-    ta = table.getEntry("ta");
-    
-    limelightX = tx.getDouble(0);
-    limelightY = ty.getDouble(0);
-    limelightArea = ta.getDouble(0);
+   
 
 
     angleToGoalDegrees = Statics.Limelight_Mount_Angle_Degrees + limelightY;
@@ -282,8 +285,8 @@ public class Robot extends TimedRobot {
           LED.set(-0.93);
       }
     }
-    else if(scanForBalls() && LED.get() != 0.67){
-      LED.set(0.67);
+    else if(scanForBalls() && LED.get() != 0.71){
+      LED.set(0.71);
     }
     else if(!scanForBalls() && LED.get() != 0.43){
       LED.set(0.43);
@@ -487,10 +490,16 @@ public class Robot extends TimedRobot {
 
   public void climb(boolean up, boolean down, int horizontalDirection, boolean climbStopperButton){
     if (up){
-      verticalClimb.set(-Statics.Vertical_Climb_Speed);
-      climbLED = true;
-    } else if (down) {
       verticalClimb.set(Statics.Vertical_Climb_Speed);
+      climbLED = true;
+      if(climbStopper.get() != 0.25){
+        climbStopper.set(0.25);
+      }
+    } else if (down) {
+      verticalClimb.set(-Statics.Vertical_Climb_Speed);
+      if(climbStopper.get() != 0.25){
+        climbStopper.set(0.25);
+      }
     } else {
       verticalClimb.set(0);
     }
@@ -503,8 +512,8 @@ public class Robot extends TimedRobot {
       horizontalClimb.set(0);
     }
 
-    if (climbStopperButton && climbStopper.get() != 0){
-      climbStopper.set(0);
+    if (climbStopperButton && climbStopper.get() != .25){
+      climbStopper.set(.25);
     } 
     else if (climbStopperButton && climbStopper.get() != .5){
       climbStopper.set(.5); 
@@ -526,7 +535,7 @@ public class Robot extends TimedRobot {
     distanceToTarget.setDouble(distanceFromLimelightToGoalInches);
     shooterRPMEntry.setDouble(shooter.getSelectedSensorVelocity());
     shooterSpeedEntry.setDouble(shooterSpeed);
-    if (ratchetPos > 45)
+    if (ratchetPos > 0.25)
       ratchetEngaged.setBoolean(true);
     else
       ratchetEngaged.setBoolean(false);
@@ -541,7 +550,7 @@ public class Robot extends TimedRobot {
     shooterN = shooter.get();
     indexN = index.get();
     intakeN = intake.get();
-    ratchetPos = climbStopper.getAngle();
+    ratchetPos = climbStopper.get();
 
     //shooterRPM = 0;
     shooter.getSelectedSensorVelocity();

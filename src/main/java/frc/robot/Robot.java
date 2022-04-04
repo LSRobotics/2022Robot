@@ -152,7 +152,7 @@ public class Robot extends TimedRobot {
   double ty;
   double ta;
 
-  NetworkTableEntry MyContourReport;
+  NetworkTable MyContourReport;
 
   double defaultDouble;
 
@@ -261,10 +261,15 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
   
-   // MyContourReport = NetworkTableInstance.getDefault().getTable("limelight");
-    //ty = MyContourReport.getEntry("ty").getDouble(defaultDouble);
-   // SmartDashboard.putNumber("ty",ty);
+    MyContourReport = NetworkTableInstance.getDefault().getTable("limelight");
+    ty = MyContourReport.getEntry("ty").getDouble(defaultDouble);
+    tx = MyContourReport.getEntry("tx").getDouble(defaultDouble);
+    ta = MyContourReport.getEntry("ta").getDouble(defaultDouble);
+    SmartDashboard.putNumber("ty",ty);
     
+    limelightY = ty;
+    limelightX = tx;
+    limelightArea = ta;
     
     updateInputs();
     updateNetworkEntries();

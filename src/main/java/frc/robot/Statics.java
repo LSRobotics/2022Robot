@@ -33,7 +33,7 @@ public class Statics {
     public final static double Shooter_Target_RPM = 18000;
     public final static double Shooter_Speed = 0.5;
     
-    public final static double Fast_Drive_Speed = 0.8;
+    public final static double Fast_Drive_Speed = 1;
     public final static double Slow_Drive_Speed = 0.6
     ;
     public final static double Fast_Turn_Speed = 0.7;
@@ -44,7 +44,7 @@ public class Statics {
     public final static double deadbandCutoff = 0.1;
 
     public final static int Shooter_Motor_ID = 5;
-    public final static int Index_Motor_ID = 0;
+    public final static int Index_Motor_ID = 0;     
     public final static int Intake_Motor_ID = 2; 
     public final static int Intake_Up_Down_Motor_ID = 7;
     public final static int ledControllerID = 6;

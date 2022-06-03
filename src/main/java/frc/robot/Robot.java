@@ -374,7 +374,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-     
+     shooterSpeed = .7;
   }
 
   /** This function is called periodically during operator control. */
@@ -495,13 +495,13 @@ public class Robot extends TimedRobot {
 
   public void climb(boolean up, boolean down, int horizontalDirection, boolean climbStopperButton){
     if (up){
-      verticalClimb.set(Statics.Vertical_Climb_Speed);
+      verticalClimb.set(-Statics.Vertical_Climb_Speed);
       climbLED = true;
       if(climbStopper.get() != 0.25){
         climbStopper.set(0.25);
       }
     } else if (down) {
-      verticalClimb.set(-Statics.Vertical_Climb_Speed);
+      verticalClimb.set(Statics.Vertical_Climb_Speed);
       if(climbStopper.get() != 0.25){
         climbStopper.set(0.25);
       }
@@ -590,13 +590,18 @@ public class Robot extends TimedRobot {
 
   public void controlIntakeShooterIndex(boolean reverseIntake, boolean forwardIntake, boolean shoot, boolean reverseShoot, boolean raiseSpeed, boolean lowerSpeed){
         
-      if (forwardIntake)
+      if (forwardIntake){
         intake.set(-Statics.Intake_Speed);
-      else if (reverseIntake)
+        intakeUpDown.set(-0.25);
+      }
+      else if (reverseIntake){
         intake.set(Statics.Intake_Speed);
-      else
+        intakeUpDown.set(-0.25);
+      }
+      else{
         intake.set(0);
-   
+        intakeUpDown.set(0);
+      }
       if (shooter.getSelectedSensorVelocity() > Statics.Shooter_Target_RPM*shooterSpeed){
         index.set(Statics.Index_Speed);
       }
